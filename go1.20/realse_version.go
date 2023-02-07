@@ -8,7 +8,8 @@ import (
 	"unicode/utf16"
 )
 
-//go 1.20新版本功能测试
+// go 1.20新版本功能测试
+// https://go.dev/doc/go1.20
 
 func main() {
 	StringsCollect()
