@@ -16,6 +16,7 @@ func main() {
 	reflect_type()
 	reflect_value()
 	use_any()
+	display.Use_person()
 }
 
 // Type是一个有很多方法的接口
