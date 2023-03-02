@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -30,43 +31,54 @@ type GetAppList struct {
 	Page     string `json:"page"`
 }
 
+type GetAppInfoReq struct {
+	Platform string `json:"platform"`
+	Name     string `json:"name"`
+	Version  string `json:"version"`
+}
+
 const (
-	LOGIN_URL = "http://192.168.20.42/api/authCenter/login"
-	APP_URL   = "http://192.168.20.42/api/terminalCenter/app/cloud/driver/page"
-	ACCOUNT   = "sysadmin"
-	PASSWORD  = "sysadmin"
-	LOGINTYPE = "PASSWORD"
+	LOGIN_URL    = "http://192.168.20.42/api/authCenter/login"
+	APP_URL      = "http://192.168.20.42/api/terminalCenter/app/cloud/driver/page"
+	APP_INFO_URL = "http://192.168.20.42/api/driverCenter/external/appconfig"
+	ACCOUNT      = "sysadmin"
+	PASSWORD     = "sysadmin"
+	LOGINTYPE    = "PASSWORD"
 )
 
 // 请求类型，请求地址，鉴权key，请求体
-func CreateHttpRequest[T any](method, url, key string, body T) ([]byte, error) {
-	b, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-	reqBody := strings.NewReader(string(b))
-
+func CreateHttpRequest[T any](method, reqUrl, autherKey string, body T) ([]byte, error) {
+	var reqBody io.Reader
 	if method == http.MethodGet {
-		if reflect.TypeOf(body).Kind() != reflect.Ptr || reflect.TypeOf(body).Elem().Kind() != reflect.Struct {
+		t := reflect.TypeOf(body)
+		if t.Kind() != reflect.Ptr || t.Elem().Kind() != reflect.Struct {
 			panic("params must be a pointer to struct")
 		}
 
+		params := url.Values{}
 		v := reflect.ValueOf(body).Elem()
 		for i := 0; i < v.NumField(); i++ {
-			field := v.Field(i)
-			fmt.Printf("%v - %v\n", v.Field(i).Interface(), field.Type().Name())
+			params.Set(strings.ToLower(v.Type().Field(i).Name), strings.ToLower(v.Field(i).String()))
 		}
+		reqUrl = fmt.Sprintf("%s?%s", reqUrl, params.Encode())
+	} else {
+		b, err := json.Marshal(body)
+		if err != nil {
+			return nil, err
+		}
+		reqBody = strings.NewReader(string(b))
 	}
 
-	req, err := http.NewRequestWithContext(context.Background(), method, url, reqBody)
+	req, err := http.NewRequestWithContext(context.Background(), method, reqUrl, reqBody)
 	if err != nil {
 		return nil, err
 	}
 
-	if key != "" {
-		req.Header.Add("Authorization", "Bearer "+key)
-	}
 	req.Header.Add("content-type", "application/json")
+	if autherKey != "" {
+		req.Header.Add("Authorization", "Bearer "+autherKey)
+	}
+
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, err
@@ -115,31 +127,33 @@ func LoginCloudPlat() (*CloudLoginRes, error) {
 	return resp, err
 }
 
+// 校验鉴权key是否过期
 func JudgeAutherExpired() {
 
 }
 
 func main() {
+	//登陆
 	cookie, err := LoginCloudPlat()
 	if err != nil {
 		panic(err)
 	}
-	log.Println(cookie.Data, cookie.Success)
+	log.Println("cookie: ", cookie.Data, cookie.Success)
 
-	data := &GetAppList{"linux", "1", "10"}
-	b, err := CreateHttpRequest(http.MethodGet, APP_URL, cookie.Data, data)
+	//获取可安装应用
+	appData := &GetAppList{Platform: "linux", Limit: "10", Page: "2"}
+	b, err := CreateHttpRequest(http.MethodGet, APP_URL, cookie.Data, appData)
 	if err != nil {
 		panic(err)
 	}
 	log.Println(string(b))
-	testencode()
-}
+	fmt.Println("")
 
-func testencode() {
-	baseURL := "https://httpbin.org/get"
-	params := url.Values{}
-	params.Set("name", "value")
-	params.Set("age", "14")
-	reqURL := fmt.Sprintf("%s?%s", baseURL, params.Encode())
-	fmt.Println(reqURL)
+	//获取应用详细信息
+	infoData := &GetAppInfoReq{Platform: "linux", Name: "GB_Modbus_Poll_TCP", Version: "v2.0.0-beta5"}
+	b2, err := CreateHttpRequest(http.MethodGet, APP_INFO_URL, cookie.Data, infoData)
+	if err != nil {
+		panic(err)
+	}
+	log.Println(string(b2))
 }
