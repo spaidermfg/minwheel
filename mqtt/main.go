@@ -23,7 +23,7 @@ func cat() {
 	client := connect("client-1", "ssl://192.168.20.82:8883", onMessageReceived)
 
 	// 订阅主题
-	subscribe(client, "/DEVICE/BASE/MAGUS/cloud/#")
+	subscribe(client, "/DEVICE/BASE/MAGUS/edge/#")
 
 	// 等待消息接收
 	waitForMessages()
