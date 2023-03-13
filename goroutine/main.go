@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
-	"sync"
 	"time"
 )
 
+/*
 func main() {
 	var wg sync.WaitGroup
 	wg.Add(2)
@@ -26,5 +26,29 @@ func process1(wg *sync.WaitGroup) {
 	fmt.Println("Process Running1")
 	wg.Done()
 }
-
+*/
 //chmod -x /root/dasserver/server/magusdog
+func main() {
+	go spinner(100 * time.Millisecond)
+	const n = 45
+	fibN := fib(n)
+	fmt.Printf("\rFibonacci(%d) = %d\n", n, fibN)
+}
+
+// 打印信息提示
+func spinner(delay time.Duration) {
+	for {
+		for _, v := range `-\|/` {
+			fmt.Printf("\r%c", v)
+			time.Sleep(delay)
+		}
+	}
+}
+
+// 计算斐波那契数
+func fib(x int) int {
+	if x < 2 {
+		return x
+	}
+	return fib(x-1) + fib(x-2)
+}
