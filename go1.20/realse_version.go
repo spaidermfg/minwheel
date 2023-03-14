@@ -16,7 +16,7 @@ func main() {
 	UnicodeCollect()
 	TimeCollect()
 	FilePathCollect()
-
+	ReplaceUse()
 }
 
 // The new CutPrefix and CutSuffix functions are like TrimPrefix and TrimSuffix but also report whether the string was trimmed.
@@ -84,4 +84,13 @@ func FilePathCollect() {
 
 func MimeCollect() {
 
+}
+
+func ReplaceUse() {
+	str := "o-k o-k o-k o-k"
+	s := strings.Replace(str, "-", "", -1)
+	fmt.Println(s)
+
+	s2 := strings.ReplaceAll(str, "-", "")
+	fmt.Println(s2)
 }
