@@ -54,3 +54,20 @@ end
 if not flag then
   print("false")
 end
+
+local function print_num(a)
+  print(a)
+end
+
+local print_nums = function (a)
+  print(a)
+end
+
+print_nums(5)
+print_num(6)
+
+function add(a, b)
+  return a + b
+end
+
+add(2,43)
