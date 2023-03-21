@@ -48,3 +48,16 @@ WORKDIR path_dir 设置工作目录
 ARG 设置编译镜像时加入的参数
 VOLUMN 设置容器的挂载卷
 ```
+
+## 1.4 数据卷
+
+* 是一个可供一个或多个容器使用的特殊目录
+* 镜像中的被指定为挂载点的目录中的文件会复制到数据卷中
+* 创建数据卷：`docker volume create my-vol`
+* 查看所有数据卷： `docker volume ls`
+* 查看指定的数据卷： `docker volume ispect my-vol`
+* 启动一个挂载数据卷的容器： `docker run -dit -P --mount source=my-vol,target=/usr/share/nginx/html nginx:alpine`
+  * --mount: 指定挂载一个本地主机的目录到容器中
+* 查看数据卷的具体信息：`docker inspect web`
+* 删除数据卷：`docker volume rm my-vol`
+* 清理数据卷：`docker volume prune`
