@@ -71,3 +71,74 @@ function add(a, b)
 end
 
 add(2,43)
+
+-- scope
+function foo()
+  local h = 10
+end
+
+print(h) -- nil
+
+--loop 
+--while 
+local i = 1
+
+while i < 10 do
+  print("hi")
+  i = i + 1
+end
+
+--for   
+for i = 1, 10 do
+  print("hello")
+  i = i + 1
+end
+
+
+--arrays
+local colors = {"red", "green", "blue"}
+print(colors[1]
+
+for i = 1, #colors do
+  print(colors[i])
+end
+
+for index, value in ipairs(colors) do
+ print(colors[index])
+ 
+ print(value)
+end
+
+for _, value in ipairs(colors) do 
+  print(value)
+end
+
+--Dictionaries
+local info = {
+  name = "min",
+  age = 12
+  flag = true
+}
+
+print(info["name"])
+print(info.name)
+
+for key, value in pairs(info) do
+  print(key .. " " .. tostring(value))
+end
+
+--list
+local data = {
+  {"Sid", 20},
+  {"mark", 23},
+}
+
+for i = 1, #data do 
+ print(data[i][1] .. " is " .. data[i][2] .. "years old")
+end
+
+-- moudle
+-- import code from one file
+require("path")
+
+require "custom"
