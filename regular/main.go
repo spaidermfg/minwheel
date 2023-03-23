@@ -50,8 +50,8 @@ func regular_use() {
 func isValidIP(ip string) bool {
 	// pattern := `^(\d{1,3}\.){3}\d{1,3}$`
 	// matched, _ := regexp.MatchString(pattern, ip)
-
-	ipRegex := regexp.MustCompile(`(\d{1,3}\.){3}\d{1,3}$`)
+	//^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$
+	ipRegex := regexp.MustCompile(`^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$`)
 	flag := ipRegex.MatchString(ip)
 	return flag
 }
