@@ -13,6 +13,10 @@ import (
 //发送： send := make(chan<- int)
 //接收: receive := <-chan
 //关闭： close(ch)
+//chan<- int: 这个类型只能发送
+//<-chan int: 这个类型只能接收
+//关闭一个已经关闭的通道会宕机，关闭一个仅能接受的通道编译时报错，关闭通道后发送操作会导致宕机
+//goroutine泄漏：发送消息到通道但没有goroutine来接收
 
 func main() {
 	c := make(chan int, 1)
@@ -20,6 +24,16 @@ func main() {
 	go receive(c)
 	time.Sleep(3 * time.Second)
 	close(c)
+
+	pipline()
+	time.Sleep(10 * time.Second)
+
+	naturals := make(chan int)
+	squares := make(chan int)
+	go counter(naturals)
+	go squarer(squares, naturals)
+	printer(squares)
+
 }
 
 func send(c chan<- int) {
@@ -37,4 +51,48 @@ func receive(c <-chan int) {
 
 func tcpClient() {
 
+}
+
+func pipline() {
+	naturals := make(chan int)
+	squares := make(chan int)
+	go func() {
+		for i := 0; i <= 100; i++ {
+			naturals <- i
+		}
+		close(naturals)
+	}()
+
+	go func() {
+		for v := range naturals {
+			squares <- v * v
+		}
+		close(squares)
+	}()
+
+	go func() {
+		for v := range squares {
+			fmt.Println("+++++++", v)
+		}
+	}()
+}
+
+func counter(out chan<- int) {
+	for i := 0; i <= 100; i++ {
+		out <- i
+	}
+	close(out)
+}
+
+func squarer(out chan<- int, in <-chan int) {
+	for v := range in {
+		out <- v * v
+	}
+	close(out)
+}
+
+func printer(in <-chan int) {
+	for v := range in {
+		fmt.Println(v)
+	}
 }
