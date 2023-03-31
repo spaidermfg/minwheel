@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"time"
+
+	"gopl.io/ch8/thumbnail"
 )
 
 //channel是goroutine之间互相通信的通道
@@ -17,6 +19,10 @@ import (
 //<-chan int: 这个类型只能接收
 //关闭一个已经关闭的通道会宕机，关闭一个仅能接受的通道编译时报错，关闭通道后发送操作会导致宕机
 //goroutine泄漏：发送消息到通道但没有goroutine来接收
+//-- 带缓冲的channel
+//发送操作相缓存队列尾部插入元素，接收操作从队列的头部删除元素
+//使用cap获取channel内部缓存的容量
+//使用len获取channel内部缓存队列中有效元素的个数
 
 func main() {
 	c := make(chan int, 1)
@@ -94,5 +100,16 @@ func squarer(out chan<- int, in <-chan int) {
 func printer(in <-chan int) {
 	for v := range in {
 		fmt.Println(v)
+	}
+}
+
+// 并发的循环
+// 循环处理图片
+func makeThumbnails(filenames []string) {
+	for _, v := range filenames {
+		// if _, err := thumbnail.ImageFile(v); err != nil {
+		// 	log.Println(err)
+		// }
+		go thumbnail.ImageFile(v)
 	}
 }
