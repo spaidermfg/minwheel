@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"time"
 )
 
@@ -45,18 +45,30 @@ func main() {
 	// 	}
 	// }
 
-	t := time.NewTicker(5 * time.Second)
-	var count int = 0
-	for i := 0; i < 10000; i++ {
-		count += i
-		log.Println("count: ", count, i)
-	}
+	// t := time.NewTicker(5 * time.Second)
+	// var count int = 0
+	// for i := 0; i < 10000; i++ {
+	// 	count += i
+	// 	log.Println("count: ", count, i)
+	// }
 
-	//阻塞主协程
+	// //阻塞主协程
+	// for {
+	// 	select {
+	// 	case <-t.C:
+	// 		log.Println("1===========================", count)
+	// 	}
+	// }
+
+	ticker := time.NewTicker(time.Second * 5)
+	defer ticker.Stop()
+
+	// 循环执行定时任务
 	for {
 		select {
-		case <-t.C:
-			log.Println("1===========================", count)
+		case <-ticker.C:
+			// 定时任务的处理逻辑
+			fmt.Println("Execute task at", time.Now())
 		}
 	}
 }

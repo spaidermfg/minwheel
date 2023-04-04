@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"minwheel/channel/chant"
 
 	"gopl.io/ch8/thumbnail"
 )
@@ -25,21 +25,22 @@ import (
 //使用len获取channel内部缓存队列中有效元素的个数
 
 func main() {
-	c := make(chan int, 1)
-	go send(c)
-	go receive(c)
-	time.Sleep(3 * time.Second)
-	close(c)
+	// c := make(chan int, 1)
+	// go send(c)
+	// go receive(c)
+	// time.Sleep(3 * time.Second)
+	// close(c)
 
-	pipline()
-	time.Sleep(10 * time.Second)
+	// pipline()
+	// time.Sleep(10 * time.Second)
 
-	naturals := make(chan int)
-	squares := make(chan int)
-	go counter(naturals)
-	go squarer(squares, naturals)
-	printer(squares)
+	// naturals := make(chan int)
+	// squares := make(chan int)
+	// go counter(naturals)
+	// go squarer(squares, naturals)
+	// printer(squares)
 
+	chant.Chant()
 }
 
 func send(c chan<- int) {
