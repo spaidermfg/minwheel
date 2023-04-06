@@ -8,7 +8,8 @@ import (
 
 func main() {
 	log.Println("start running...")
-	http.HandleFunc("/trigger", HandleRequest)
+	go http.HandleFunc("/trigger", HandleRequest)
+
 	err := http.ListenAndServe(":9000", nil)
 	if err != nil {
 		log.Fatal(err)

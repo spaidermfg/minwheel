@@ -38,9 +38,9 @@ type GetAppInfoReq struct {
 }
 
 const (
-	LOGIN_URL    = "http://192.168.20.42/api/authCenter/login"
-	APP_URL      = "http://192.168.20.42/api/terminalCenter/app/cloud/driver/page"
-	APP_INFO_URL = "http://192.168.20.42/api/driverCenter/external/appconfig"
+	LOGIN_URL    = "http://192.168.0.1/login"
+	APP_URL      = "http://192.168.0.1/driver/page"
+	APP_INFO_URL = "http://192.168.0.1/appconfig"
 	ACCOUNT      = "sysadmin"
 	PASSWORD     = "sysadmin"
 	LOGINTYPE    = "PASSWORD"
