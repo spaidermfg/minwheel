@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"minwheel/channel/chant"
+	"os"
+	"sync"
 
 	"gopl.io/ch8/thumbnail"
 )
@@ -41,6 +44,7 @@ func main() {
 	// printer(squares)
 
 	chant.Chant()
+	handleImage()
 }
 
 func send(c chan<- int) {
@@ -104,13 +108,62 @@ func printer(in <-chan int) {
 	}
 }
 
+type item struct {
+	thumbfile string //filename
+	err       error  //error
+	size      int64  //file size
+}
+
 // 并发的循环
 // 循环处理图片
-func makeThumbnails(filenames []string) {
+func makeThumbnails(filenames []string) (thumbfiles []item, err error) {
+	//创建通道计数
+	//ch := make(chan struct{})
+	ch := make(chan item, len(filenames))
+	var wg sync.WaitGroup //工作的goroutine个数
 	for _, v := range filenames {
+		wg.Add(1)
 		// if _, err := thumbnail.ImageFile(v); err != nil {
 		// 	log.Println(err)
 		// }
-		go thumbnail.ImageFile(v)
+		go func(v string) {
+			defer wg.Done()
+			var it item
+			it.thumbfile, it.err = thumbnail.ImageFile(v)
+			fi, _ := os.Stat(it.thumbfile)
+			it.size = fi.Size()
+			log.Println(it.size)
+			ch <- it
+
+		}(v)
+	}
+
+	go func() {
+		//等待和关闭
+		wg.Wait()
+		close(ch)
+	}()
+
+	//wait goroutine exec finish
+	for range filenames {
+		it := <-ch
+		if it.err != nil {
+			log.Println(err)
+			return nil, it.err
+		}
+		thumbfiles = append(thumbfiles, it)
+	}
+	return thumbfiles, nil
+}
+
+func handleImage() {
+	a := []string{"a.jpg"}
+	thumbfiles, err := makeThumbnails(a)
+	if err != nil {
+		log.Fatal("[error]: ", err)
+	}
+
+	for _, v := range thumbfiles {
+		log.Println("| FileName: ", v.thumbfile, "| FileSize: ", v.size, "| error: ", v.err)
 	}
 }
