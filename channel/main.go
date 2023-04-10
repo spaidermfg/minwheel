@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"minwheel/channel/chant"
 
 	"gopl.io/ch8/thumbnail"
@@ -41,6 +42,7 @@ func main() {
 	// printer(squares)
 
 	chant.Chant()
+	handleImage()
 }
 
 func send(c chan<- int) {
@@ -107,10 +109,28 @@ func printer(in <-chan int) {
 // 并发的循环
 // 循环处理图片
 func makeThumbnails(filenames []string) {
+	//创建通道计数
+	ch := make(chan struct{})
+	errors := make(chan error)
 	for _, v := range filenames {
 		// if _, err := thumbnail.ImageFile(v); err != nil {
 		// 	log.Println(err)
 		// }
-		go thumbnail.ImageFile(v)
+		go func(v string) {
+			_, err := thumbnail.ImageFile(v)
+			errors <- err
+		}(v)
 	}
+
+	//wait goroutine exec finish
+	for range filenames {
+		if err := errors; err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
+func handleImage() {
+	a := []string{"a.jpg"}
+	makeThumbnails(a)
 }
