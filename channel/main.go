@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"minwheel/channel/chant"
+	"minwheel/channel/webbug"
 	"os"
 	"sync"
 
@@ -45,6 +46,7 @@ func main() {
 
 	chant.Chant()
 	handleImage()
+  webbug.Bug()
 }
 
 func send(c chan<- int) {
