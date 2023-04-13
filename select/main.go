@@ -17,8 +17,8 @@ import (
 )
 
 const (
-	DASS_THREE   = "deploy_dass3"
-	DASS_CONSOLE = "deploy_dassc"
+	DASS_THREE   = "a"
+	DASS_CONSOLE = "b"
 )
 
 func main() {
@@ -34,22 +34,31 @@ func main() {
 
 func HandleFunc(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	log.Println("path:", r.Host+r.URL.Path)
+	dt := r.Form.Get("dc")
+	dc := r.Form.Get("dt")
+	if dt == "" {
+		dt = "dev"
+	}
+	if dc == "" {
+		dc = "dev"
+	}
+	log.Println("path:", r.Host+r.URL.Path, "dassBranch:", dt, "consoleBranch:", dc)
 
 	var wg sync.WaitGroup
-	apps := []string{DASS_CONSOLE, DASS_THREE}
+	apps := map[string]string{DASS_CONSOLE: dc, DASS_THREE: dt}
 	results := make(chan string, len(apps))
-	for _, app := range apps {
+
+	for app, br := range apps {
 		wg.Add(1)
-		go func(appName string) {
+		go func(appName, branch string) {
 			defer wg.Done()
-			info, err := deployApp(appName)
+			info, err := deployApp(appName, branch)
 			if err != nil {
 				results <- err.Error()
 				return
 			}
 			results <- info
-		}(app)
+		}(app, br)
 	}
 
 	go func() {
@@ -64,8 +73,13 @@ func HandleFunc(w http.ResponseWriter, r *http.Request) {
 
 func HandleConsoleRequest(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	log.Println("path:", r.Host+r.URL.Path)
-	info, err := deployApp(DASS_CONSOLE)
+	branch := r.Form.Get("branch")
+	if branch == "" {
+		branch = "dev"
+	}
+
+	log.Println("path:", r.Host+r.URL.Path, "branch:", branch)
+	info, err := deployApp(DASS_CONSOLE, branch)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -75,8 +89,13 @@ func HandleConsoleRequest(w http.ResponseWriter, r *http.Request) {
 
 func HandleDass3Request(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
-	log.Println("path:", r.Host+r.URL.Path)
-	info, err := deployApp(DASS_THREE)
+	branch := r.Form.Get("branch")
+	if branch == "" {
+		branch = "dev"
+	}
+
+	log.Println("path:", r.Host+r.URL.Path, "branch:", branch)
+	info, err := deployApp(DASS_THREE, branch)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -84,11 +103,11 @@ func HandleDass3Request(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(info + "\n" + "deployment dass3 succeded!!!"))
 }
 
-func deployApp(app string) (string, error) {
-	output, err := exec.Command("/bin/sh", "-c", fmt.Sprintf("./%s.sh", app)).Output()
+func deployApp(app, branch string) (string, error) {
+	output, err := exec.Command("/bin/sh", "-c", fmt.Sprintf("./%s.sh %v", app, branch)).Output()
 	if err != nil {
 		log.Fatal(err)
-		return "", fmt.Errorf("Error running deploy script[%v.sh]: %v", app, err)
+		return "", fmt.Errorf("Error running deploy script[%v.sh] of branch[%v]: %v", app, branch, err)
 	}
 	return string(output), nil
 }
