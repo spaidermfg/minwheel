@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 	"time"
 )
 
@@ -10,9 +11,16 @@ import (
 
 func main() {
 	abort := make(chan struct{})
+
+	//监听终端输入
+	go func() {
+		os.Stdin.Read(make([]byte, 1))
+		abort <- struct{}{}
+	}()
 	log.Println("Commencing countdown")
 	c := time.Tick(time.Second * 1)
 
+	//实现倒计时，多路复用
 	for countdown := 10; countdown > 0; countdown-- {
 		log.Println(countdown)
 		select {
