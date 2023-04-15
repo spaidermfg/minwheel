@@ -1,94 +1,39 @@
-// package main
-
-// //基于select的多路复用
-
-// func main() {
-
-// }
-
 package main
 
 import (
-	"fmt"
 	"log"
-	"net/http"
-	"os/exec"
-	"sync"
+	"os"
+	"time"
 )
 
-const (
-	DASS_THREE   = "deploy_dass3"
-	DASS_CONSOLE = "deploy_dassc"
-)
+//基于select的多路复用
+//没有任何case的select{}语句会一直阻塞下去
 
 func main() {
-	log.Println("start running...")
-	http.HandleFunc("/deploy", HandleFunc)
-	http.HandleFunc("/deploy/dass3", HandleDass3Request)
-	http.HandleFunc("/deploy/console", HandleConsoleRequest)
-	err := http.ListenAndServe(":9999", nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
+	abort := make(chan struct{})
 
-func HandleFunc(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	log.Println("path:", r.Host+r.URL.Path)
-
-	var wg sync.WaitGroup
-	apps := []string{DASS_CONSOLE, DASS_THREE}
-	results := make(chan string, len(apps))
-	for _, app := range apps {
-		wg.Add(1)
-		go func(appName string) {
-			defer wg.Done()
-			info, err := deployApp(appName)
-			if err != nil {
-				results <- err.Error()
-				return
-			}
-			results <- info
-		}(app)
-	}
-
+	//监听终端输入
 	go func() {
-		wg.Wait()
-		close(results)
+		os.Stdin.Read(make([]byte, 1))
+		abort <- struct{}{}
 	}()
+	log.Println("Commencing countdown")
+	c := time.Tick(time.Second * 1)
 
-	for info := range results {
-		fmt.Fprintf(w, "%s\n", info)
+	//实现倒计时，多路复用
+	for countdown := 10; countdown > 0; countdown-- {
+		log.Println(countdown)
+		select {
+		case <-c:
+			log.Println("--------------------")
+		case <-abort:
+			log.Println("launch abort")
+			return
+		}
 	}
+	launch()
 }
 
-func HandleConsoleRequest(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	log.Println("path:", r.Host+r.URL.Path)
-	info, err := deployApp(DASS_CONSOLE)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Write([]byte(info + "\n" + "deployment dassConsole succeeded!!!"))
-}
-
-func HandleDass3Request(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm()
-	log.Println("path:", r.Host+r.URL.Path)
-	info, err := deployApp(DASS_THREE)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	w.Write([]byte(info + "\n" + "deployment dass3 succeded!!!"))
-}
-
-func deployApp(app string) (string, error) {
-	output, err := exec.Command("/bin/sh", "-c", fmt.Sprintf("./%s.sh", app)).Output()
-	if err != nil {
-		log.Fatal(err)
-		return "", fmt.Errorf("Error running deploy script[%v.sh]: %v", app, err)
-	}
-	return string(output), nil
+func launch() {
+	log.Println("Commencing countdown!!!")
 }
