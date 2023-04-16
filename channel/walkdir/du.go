@@ -1,6 +1,7 @@
 package walkdir
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -28,4 +29,19 @@ func dirents(dir string) []os.FileInfo {
 		fmt.Fprintf(os.Stderr, "du: %v\n", err)
 	}
 	return entries
+}
+
+func beginWalk() {
+	flag.Parse()
+	roots := flag.Args()
+	if len(roots) == 0 {
+		roots = []string{"."}
+	}
+	fileSizes := make(chan int64)
+	go func() {
+		for _, root := range roots {
+			walkDir(root, fileSizes)
+		}
+		close(fileSizes)
+	}()
 }
