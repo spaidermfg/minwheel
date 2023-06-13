@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"strings"
+  "log"
 )
 
 func main() {
@@ -14,6 +15,12 @@ func main() {
 	// arr := strings.Split(suf, ".")
 	// normalPath := path.Join(pre, arr[0]+"bak"+path.Ext(suf))
 	// fmt.Println(normalPath)
+  //findBadLine()
+  changeContent()
+}
+
+
+func findBadLine() {
 	path := "dasserver.conf"
 	paths := "dasserverbak.conf"
 	file, err := os.OpenFile(path, os.O_RDWR, 0666)
@@ -45,4 +52,27 @@ func main() {
 		}
 	}
 	os.Rename(paths, path)
+}
+
+func changeContent() {
+  filename := "config.yaml"
+
+  file, err := os.OpenFile(filename, os.O_RDWR, 0666)
+  if err != nil {
+    log.Fatal(err, "open file failed!")
+  }
+  defer file.Close()
+
+
+  reader := bufio.NewReader(file)
+  for {
+    line, isPrefix, err := reader.ReadLine()
+    if err == io.EOF || err != nil {
+      log.Fatal(err, "end line!")
+    }
+
+    log.Println("line:", string(line), "is prefix:", isPrefix)
+  }
+
+  
 }

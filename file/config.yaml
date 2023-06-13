@@ -1,0 +1,59 @@
+server:
+  address:     ":8095"
+  httpsAddr:   ":8443"
+  openapiPath: "/api.json"
+  swaggerPath: "/swagger"
+  maxHeaderBytes: "200MB" # 请求头大小限制，请求头包括客户端提交的Cookie数据
+  clientMaxBodySize: "200MB" # 客户端提交的Body大小限制，同时也影响文件上传大小
+
+logger:
+  path:       "logs"
+  file:       "dassConsole.log"
+  level :     "all"
+  stdout:     true
+  rotateSize: 3MB
+  rotateBackupLimit: 100
+
+grpc:
+  withTls: false # 上线后开启
+  certFile: "tls/service.pem"
+
+pgo:
+  enable: true # 上线后关闭
+
+# 数据库连接配置
+database:
+  #   logger:
+  #     path:    "logs/sql"
+  #     level:   "all"
+  #     stdout:  false
+  #     ctxKeys: ["RequestId"]
+
+#  default:
+#    link:   "sqlite::@file(./manifest/db/data.db)"
+#    debug:  true
+
+  default: # todo 開發使用mysql
+    link: "mysql:root:123456@tcp(192.168.20.82:3306)/dassConsole"
+    debug: false
+
+#TODO：上線需刪除
+#redis配置
+redis:
+  default:
+    address: 192.168.20.82:6379
+    db: 0
+
+#云平台配置
+cloud:
+  protocol: "http://"
+  host: "192.168.20.42:80"   #host:port
+  user:
+    account: "sysadmin"
+    password: "sysadmin"
+    loginType: "PASSWORD"
+  link:
+    login: "/api/authCenter/login"
+    appList: "/api/terminalCenter/app/cloud/driver/page"  #可安装应用列表
+    appInfo: "/api/driverCenter/external/appconfig"        #应用配置信息
+
