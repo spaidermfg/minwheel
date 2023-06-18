@@ -98,13 +98,13 @@ func (h *HelloServiceImpl) mustEmbedUnimplementedHelloServiceServer() {
 	panic("implement me")
 }
 
-// 基于服务器端的grpc
+// HelloProtobuf 基于服务器端的grpc
 func (h *HelloServiceImpl) HelloProtobuf(ctx context.Context, args *protobuf.String) (*protobuf.String, error) {
 	reply := &protobuf.String{Value: "Hello: " + args.GetValue()}
 	return reply, nil
 }
 
-// 接收客户端发来的消息
+// Channel 接收客户端发来的消息
 func (h *HelloServiceImpl) Channel(stream protobuf.HelloService_ChannelServer) error {
 	for {
 		args, err := stream.Recv()
