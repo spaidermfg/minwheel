@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/reflection"
 	"grpc/protobuf"
 	"io"
 	"log"
@@ -24,8 +26,16 @@ func main() {
 	//将对象类型中所有满足rpc规则的方法注册为rpc函数
 	//	rpc.RegisterName("HelloService", new(HelloService))
 	log.Println("grpc server start...")
-	grpcServer := grpc.NewServer()
-	protobuf.RegisterHelloServiceServer(grpcServer, new(HelloServiceImpl))
+	//tls加密
+	creds, err := credentials.NewServerTLSFromFile("grpc/server.crt", "grpc/server.key")
+	if err != nil {
+		log.Fatal(err)
+	}
+	s := grpc.NewServer(grpc.Creds(creds))
+
+	//启动反射服务
+	reflection.Register(s)
+	//protobuf.RegisterHelloServiceServer(grpcServer, new(HelloServiceImpl))
 	RegisterHelloService(new(HelloService))
 
 	//base of http protocol

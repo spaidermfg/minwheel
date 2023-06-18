@@ -1,6 +1,8 @@
 package main
 
 import (
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 	"log"
 	"net"
 	"net/rpc"
@@ -45,6 +47,12 @@ type HelloServiceClient struct {
 //var _ HelloServiceInterface = (*HelloServiceClient) (nil)
 
 func DialHelloService(network, address string) (*HelloServiceClient, error) {
+	//验证服务端证书
+	creds, err := credentials.NewClientTLSFromFile("grpc/server.key", "server.grpc.io")
+	if err != nil {
+		log.Fatal(err)
+	}
+	grpc.Dial(network, grpc.WithTransportCredentials(creds))
 	c, err := rpc.Dial(network, address)
 	if err != nil {
 		return nil, err
