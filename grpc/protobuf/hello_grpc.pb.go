@@ -23,6 +23,8 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type HelloServiceClient interface {
 	HelloProtobuf(ctx context.Context, in *String, opts ...grpc.CallOption) (*String, error)
+	// stream启用流特性
+	Channel(ctx context.Context, opts ...grpc.CallOption) (HelloService_ChannelClient, error)
 }
 
 type helloServiceClient struct {
@@ -42,11 +44,44 @@ func (c *helloServiceClient) HelloProtobuf(ctx context.Context, in *String, opts
 	return out, nil
 }
 
+func (c *helloServiceClient) Channel(ctx context.Context, opts ...grpc.CallOption) (HelloService_ChannelClient, error) {
+	stream, err := c.cc.NewStream(ctx, &HelloService_ServiceDesc.Streams[0], "/main.HelloService/Channel", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &helloServiceChannelClient{stream}
+	return x, nil
+}
+
+type HelloService_ChannelClient interface {
+	Send(*String) error
+	Recv() (*String, error)
+	grpc.ClientStream
+}
+
+type helloServiceChannelClient struct {
+	grpc.ClientStream
+}
+
+func (x *helloServiceChannelClient) Send(m *String) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *helloServiceChannelClient) Recv() (*String, error) {
+	m := new(String)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // HelloServiceServer is the server API for HelloService service.
 // All implementations must embed UnimplementedHelloServiceServer
 // for forward compatibility
 type HelloServiceServer interface {
 	HelloProtobuf(context.Context, *String) (*String, error)
+	// stream启用流特性
+	Channel(HelloService_ChannelServer) error
 	mustEmbedUnimplementedHelloServiceServer()
 }
 
@@ -56,6 +91,9 @@ type UnimplementedHelloServiceServer struct {
 
 func (UnimplementedHelloServiceServer) HelloProtobuf(context.Context, *String) (*String, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HelloProtobuf not implemented")
+}
+func (UnimplementedHelloServiceServer) Channel(HelloService_ChannelServer) error {
+	return status.Errorf(codes.Unimplemented, "method Channel not implemented")
 }
 func (UnimplementedHelloServiceServer) mustEmbedUnimplementedHelloServiceServer() {}
 
@@ -88,6 +126,32 @@ func _HelloService_HelloProtobuf_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _HelloService_Channel_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(HelloServiceServer).Channel(&helloServiceChannelServer{stream})
+}
+
+type HelloService_ChannelServer interface {
+	Send(*String) error
+	Recv() (*String, error)
+	grpc.ServerStream
+}
+
+type helloServiceChannelServer struct {
+	grpc.ServerStream
+}
+
+func (x *helloServiceChannelServer) Send(m *String) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *helloServiceChannelServer) Recv() (*String, error) {
+	m := new(String)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // HelloService_ServiceDesc is the grpc.ServiceDesc for HelloService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -100,6 +164,13 @@ var HelloService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _HelloService_HelloProtobuf_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "Channel",
+			Handler:       _HelloService_Channel_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "hello.proto",
 }

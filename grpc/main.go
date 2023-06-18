@@ -60,11 +60,6 @@ func main() {
 
 type HelloService struct{}
 
-func (h *HelloService) mustEmbedUnimplementedHelloServiceServer() {
-	//TODO implement me
-	panic("implement me")
-}
-
 func (h *HelloService) Hello(request string, reply *string) error {
 	*reply = "hello: " + request
 	return nil
@@ -88,8 +83,34 @@ func (h *HelloService) HelloProtoBuf(request *protobuf.String, reply *protobuf.S
 type HelloServiceImpl struct {
 }
 
+func (h *HelloServiceImpl) mustEmbedUnimplementedHelloServiceServer() {
+	//TODO implement me
+	panic("implement me")
+}
+
 // 基于服务器端的grpc
 func (h *HelloServiceImpl) HelloProtobuf(ctx context.Context, args *protobuf.String) (*protobuf.String, error) {
 	reply := &protobuf.String{Value: "Hello: " + args.GetValue()}
 	return reply, nil
+}
+
+// 接收客户端发来的消息
+func (h *HelloServiceImpl) Channel(stream protobuf.HelloService_ChannelServer) error {
+	for {
+		args, err := stream.Recv()
+		if err != nil {
+			if err == io.EOF {
+				return nil
+			}
+			return err
+		}
+
+		reply := &protobuf.String{
+			Value: "Hello:" + args.GetValue(),
+		}
+		err = stream.Send(reply)
+		if err != nil {
+			return err
+		}
+	}
 }

@@ -8,4 +8,6 @@ message String {
 
 service HelloService {
   rpc HelloProtobuf(String) returns (String);
+  //stream启用流特性
+  rpc Channel (stream String) returns (stream String);
 }

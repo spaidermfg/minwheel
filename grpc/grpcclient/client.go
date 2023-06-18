@@ -68,3 +68,6 @@ func (p *HelloServiceClient) HelloConn(request string, reply *string) error {
 }
 
 const HelloServiceName = "path/to/pkg.HelloService"
+
+type HelloServiceImpl struct {
+}
