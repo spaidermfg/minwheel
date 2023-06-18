@@ -15,6 +15,7 @@ require (
 	capnproto.org/go/capnp/v3 v3.0.0-alpha-29 // indirect
 	github.com/stretchr/testify v1.8.2 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c // indirect
+	google.golang.org/protobuf v1.30.0 // indirect
 	zenhack.net/go/util v0.0.0-20230414204917-531d38494cf5 // indirect
 )
 

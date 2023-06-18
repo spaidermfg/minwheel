@@ -1,6 +1,9 @@
 package main
 
 import (
+	"context"
+	"google.golang.org/grpc"
+	"grpc/protobuf"
 	"io"
 	"log"
 	"net/http"
@@ -11,11 +14,18 @@ import (
 // RPC 和 Protobuf
 // Remote Procedure Call 远程过程调用,  net/rpc
 // RPC规则：方法只能有两个可序列化的参数，其中第二个参数是指针类型，并返回一个error类型，必须是公开的方法。
+// protobuf
+// 最基本的数据单元： message
+// 通过成员的唯一编号来绑定对应的数据
+// 生成proto文件相对应的go代码需要使用protoc工具，还需要安装针对go语言的代码生成插件protoc-gen-go
+// grpc是基于protobuf开发的跨语言的开源rpc框架， 基于http2.0协议设计
 
 func main() {
 	//将对象类型中所有满足rpc规则的方法注册为rpc函数
 	//	rpc.RegisterName("HelloService", new(HelloService))
 	log.Println("grpc server start...")
+	grpcServer := grpc.NewServer()
+	protobuf.RegisterHelloServiceServer(grpcServer, new(HelloServiceImpl))
 	RegisterHelloService(new(HelloService))
 
 	//base of http protocol
@@ -50,6 +60,11 @@ func main() {
 
 type HelloService struct{}
 
+func (h *HelloService) mustEmbedUnimplementedHelloServiceServer() {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (h *HelloService) Hello(request string, reply *string) error {
 	*reply = "hello: " + request
 	return nil
@@ -63,4 +78,18 @@ type HelloServiceInterface interface {
 
 func RegisterHelloService(svc HelloServiceInterface) error {
 	return rpc.RegisterName(HelloServiceName, svc)
+}
+
+func (h *HelloService) HelloProtoBuf(request *protobuf.String, reply *protobuf.String) error {
+	reply.Value = "Hello: " + request.GetValue()
+	return nil
+}
+
+type HelloServiceImpl struct {
+}
+
+// 基于服务器端的grpc
+func (h *HelloServiceImpl) HelloProtobuf(ctx context.Context, args *protobuf.String) (*protobuf.String, error) {
+	reply := &protobuf.String{Value: "Hello: " + args.GetValue()}
+	return reply, nil
 }
