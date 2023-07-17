@@ -3,17 +3,17 @@ package main
 import (
 	"log"
 
-	"go.bug.st/serial"
+	serials "go.bug.st/serial"
 )
 
 // 串口通信
 // 常用repo
-//  	https://github.com/bugst/go-serial.git   -> go get go.bug.st/serial
-// 		https://github.com/jacobsa/go-serial.git
-// 		https://github.com/tarm/serial.git
+//  https://github.com/bugst/go-serial.git   -> go get go.bug.st/serial
+// 	https://github.com/jacobsa/go-serial.git
+// 	https://github.com/tarm/serial.git
 
 func main() {
-	ports, err := serial.GetPortsList()
+	ports, err := serials.GetPortsList()
 	if err != nil {
 		log.Fatal(err)
 	}
