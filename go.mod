@@ -14,6 +14,7 @@ require (
 require (
 	capnproto.org/go/capnp/v3 v3.0.0-alpha-29 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
+	github.com/jacobsa/go-serial v0.0.0-20180131005756-15cf729a72d4 // indirect
 	github.com/stretchr/testify v1.8.2 // indirect
 	github.com/tarm/serial v0.0.0-20180830185346-98f6abe2eb07 // indirect
 	go.bug.st/serial v1.5.0 // indirect
