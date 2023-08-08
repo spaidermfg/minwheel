@@ -38,6 +38,13 @@ func BenchmarkCriticalSectionSyncByChan(b *testing.B) {
 	}
 }
 
+//Mutex等sync包中定义的结构类型在首次使用后不应对其进行复制操作
+//由于首次使用后，Mutex进入locked状态，再次进行复制使用时，复制了locked状态的Mutex实例，导致程序进入死锁状态
+//type Mutex struct {
+//	state int32    //表示当前互斥锁的状态
+//	sema uint32	   //用于控制锁状态的信号量
+//}
+
 // sync.Once实现单例模式
 // 保证任意一个函数在程序运行期间只被执行一次
 
