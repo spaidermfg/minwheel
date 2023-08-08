@@ -9,6 +9,7 @@ import (
 // channel属于高级同步原语，构建在低级同步原语上，性能比低级同步原语稍逊一筹
 // 不要复制首次使用后的并发原语
 // 并发量较小的情况下，互斥锁性能更好；读写锁适用于具有一定并发量且读多写少的场合。
+// 互斥锁时临界区同步原语的首选，常用来对结构体对象的内部状态、缓存进行保护
 var cs = 0
 var mu sync.Mutex
 var c = make(chan struct{}, 1)
@@ -36,6 +37,45 @@ func BenchmarkCriticalSectionSyncByChan(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		criticalSectionSyncByChan()
 	}
+}
+
+// RWMutex 读写锁
+// 读写锁的读锁性能恒定，不会随并发量的变化有巨大波动
+// 并发量较大的情况下，读写锁的写锁性能较差，随着并发量的增大，性能有继续下降的趋势
+var cs1 = 0
+var mu1 sync.Mutex
+var cs2 = 0
+var mu2 sync.RWMutex
+
+// go test -bench .sync_test.go -cpu 2
+func BenchmarkReadSyncByMutex(b *testing.B) {
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			mu1.Lock()
+			_ = cs1
+			mu1.Unlock()
+		}
+	})
+}
+
+func BenchmarkReadSyncByRWMutex(b *testing.B) {
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			mu2.RLock()
+			_ = cs2
+			mu2.RUnlock()
+		}
+	})
+}
+
+func BenchmarkWriteSyncByRWMutex(b *testing.B) {
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			mu2.Lock()
+			cs2++
+			mu2.Unlock()
+		}
+	})
 }
 
 //Mutex等sync包中定义的结构类型在首次使用后不应对其进行复制操作
