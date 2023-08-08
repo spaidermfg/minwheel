@@ -42,6 +42,7 @@ func BenchmarkCriticalSectionSyncByChan(b *testing.B) {
 // RWMutex 读写锁
 // 读写锁的读锁性能恒定，不会随并发量的变化有巨大波动
 // 并发量较大的情况下，读写锁的写锁性能较差，随着并发量的增大，性能有继续下降的趋势
+// 适合应用在具有一定并发量且读多写少的场合
 var cs1 = 0
 var mu1 sync.Mutex
 var cs2 = 0
