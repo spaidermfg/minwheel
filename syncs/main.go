@@ -10,7 +10,8 @@ import (
 // 低级同步原语
 
 func main() {
-	loopWorker()
+	//loopWorker()
+	condWorker()
 }
 
 // # 条件变量
@@ -56,6 +57,35 @@ func spawnGroup(f func(i int), num int, mu *sync.Mutex) <-chan signal {
 	return c
 }
 
+// 使用sync.Cond
+func spawnCondGroup(f func(i int), num int, groupSignal *sync.Cond) <-chan signal {
+	c := make(chan signal)
+	var wg sync.WaitGroup
+
+	for i := 0; i < num; i++ {
+		wg.Add(1)
+		go func(i int) {
+			for {
+				groupSignal.L.Lock()
+				if !ready {
+					groupSignal.Wait()
+				}
+				groupSignal.L.Unlock()
+				log.Printf("worked %d: start to work...\n", i)
+				f(i)
+				wg.Done()
+				return
+			}
+		}(i + 1)
+	}
+
+	go func() {
+		wg.Wait()
+		c <- signal(struct{}{})
+	}()
+	return c
+}
+
 func loopWorker() {
 	log.Printf("start a group of workers...")
 	mu := &sync.Mutex{}
@@ -67,6 +97,23 @@ func loopWorker() {
 	ready = true
 	log.Println("--------------------------------", ready)
 	mu.Unlock()
+
+	<-group
+	log.Printf("The group of workers work done.")
+}
+
+func condWorker() {
+	log.Printf("start a group of workers...")
+	cond := sync.NewCond(&sync.Mutex{})
+	group := spawnCondGroup(worker, 5, cond)
+	time.Sleep(5 * time.Second)
+	log.Println("the group of workers start to work...")
+
+	cond.L.Lock()
+	ready = true
+	log.Println("--------------------------------", ready)
+	cond.Broadcast()
+	cond.L.Unlock()
 
 	<-group
 	log.Printf("The group of workers work done.")
