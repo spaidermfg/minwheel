@@ -1,8 +1,10 @@
 package test
 
 import (
+	"log"
 	"sync"
 	"testing"
+	"time"
 )
 
 // 需要高性能的临界区同步机制场景
@@ -86,8 +88,48 @@ func BenchmarkWriteSyncByRWMutex(b *testing.B) {
 //	sema uint32	   //用于控制锁状态的信号量
 //}
 
-// sync.Once实现单例模式
-// 保证任意一个函数在程序运行期间只被执行一次
+// // sync.Once实现单例模式
+// 保证任意一个函数在程序运行期间只被执行一次, 常用于初始化或资源清理过程中
+type Foo struct {
+	Name string
+}
+
+var once sync.Once
+var instance *Foo
+
+func GetInstance(id int) *Foo {
+	defer func() {
+		if e := recover(); e != nil {
+			log.Printf("goroutine-%d: caught a panic: %s\n", id, instance)
+		}
+	}()
+
+	log.Printf("goroutine-%d: enter GetInstance\n", id)
+	once.Do(func() {
+		instance = &Foo{Name: "mark"}
+		time.Sleep(time.Second * 5)
+		log.Printf("goroutine-%d: the addr of instance is %p\n", id, instance)
+		panic("panic in once.Do function")
+	})
+	return instance
+}
+
+func TestOnceDo(t *testing.T) {
+	var wg sync.WaitGroup
+	for i := 0; i < 5; i++ {
+		wg.Add(1)
+		go func(i int) {
+			getInstance := GetInstance(i)
+			log.Printf("goroutine-%d: the addr of instance returned is %p\n", i, getInstance)
+			wg.Done()
+		}(i + 1)
+	}
+	time.Sleep(5 * time.Second)
+	getInstance := GetInstance(0)
+	log.Printf("goroutine-0: the addr of instance returned is %p \n", getInstance)
+	wg.Wait()
+	log.Println("all goroutine exit")
+}
 
 // sync.Pool 减轻垃圾回收压力 数据对象缓存池
 // 建立临时缓存对象池
