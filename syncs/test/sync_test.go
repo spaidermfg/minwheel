@@ -1,6 +1,7 @@
 package test
 
 import (
+	"bytes"
 	"log"
 	"sync"
 	"testing"
@@ -132,9 +133,41 @@ func TestOnceDo(t *testing.T) {
 }
 
 // sync.Pool 减轻垃圾回收压力 数据对象缓存池
+// 并发安全的，放入缓存池中的数据对象是暂时的
 // 建立临时缓存对象池
-// var bufPool = sync.Pool{
-// 	New: func() interface {
-// 		return new(bytes.Buffer)
-// 	},
-// }
+// 限制要放回缓存池中的数据对象大小, 不能超过64<<10
+var bufPool = sync.Pool{
+	New: func() interface{} {
+		return new(bytes.Buffer)
+	},
+}
+
+func writeBufFromPool(data string) {
+	buffer := bufPool.Get().(*bytes.Buffer)
+	buffer.Reset()
+	buffer.WriteString(data)
+	bufPool.Put(buffer)
+}
+
+func writeBufFromNew(data string) *bytes.Buffer {
+	b := new(bytes.Buffer)
+	b.WriteString(data)
+	return b
+}
+
+// go test -bench . sync_test.go
+func BenchmarkWithoutPool(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		writeBufFromPool("hello")
+	}
+}
+
+func BenchmarkWithNew(b *testing.B) {
+	b.ReportAllocs()
+	for i := 0; i < b.N; i++ {
+		writeBufFromNew("hello")
+	}
+
+	log.Println(64 << 10)
+}
