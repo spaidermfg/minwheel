@@ -44,8 +44,10 @@ func TestInsert(t *testing.T) {
 	house9 := models.NewHouse("big9", "aaaaaaad@google.com", "Star", "v2.0.0", 153, true)
 	house10 := models.NewHouse("big10", "aaaaaaae@google.com", "Star", "v2.0.0", 154, false)
 	house11 := models.NewHouse("big11", "aaaaaaaf@google.com", "Star", "v2.0.0", 155, false)
+	house12 := models.NewHouse("big14", "aaaaaaaf@google.com", "Star", "v2.0.0", 155, false)
 	data = append(data, house1, house2, house3, house4, house5, house6)
 	data = append(data, house7, house8, house9, house10, house11)
+	data = append(data, house12)
 
 	models.AddHouse(data)
 }

@@ -17,6 +17,11 @@ type HouseHood struct {
 	Version string `orm:"column(version)"`
 }
 
+type SqliteSequence struct {
+	Name string `orm:"column(name)"`
+	Seq  int32  `orm:"column(seq)"`
+}
+
 func NewHouse(name, email, street, version string, age int64, sex bool) *HouseHood {
 	return &HouseHood{
 		Name:    name,
@@ -81,7 +86,9 @@ func AddHouse(house []*HouseHood) {
 		log.Fatal(err)
 	}
 
-	exec, err := begin.Raw(fmt.Sprintf("TRUNCATE TABLE %v", "house_hood")).Exec()
+	begin.Raw("delete from house_hood").Exec()
+
+	exec, err := begin.Raw(fmt.Sprintf("UPDATE `sqlite_sequence` SET `seq` = 0 WHERE `name` = '%v'", "house_hood")).Exec()
 	if err != nil {
 		log.Fatal(exec, err)
 	}
@@ -95,7 +102,7 @@ func AddHouse(house []*HouseHood) {
 		log.Fatal(err)
 	}
 
-	logs.Error("[-------------insert-----------]:", res, err)
+	logs.Info("[-------------insert-----------]:", res, err)
 }
 
 func QueryHouse(house *HouseHood) {
