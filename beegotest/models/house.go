@@ -1,24 +1,30 @@
 package models
 
 import (
+	"fmt"
 	"github.com/beego/beego/v2/client/orm"
+	"github.com/beego/beego/v2/core/logs"
 	"log"
 )
 
 type HouseHood struct {
-	ID    int32  `orm:"column(id);auto"`
-	Name  string `orm:"column(name);unique"`
-	Age   int64  `orm:"column(age)"`
-	Sex   bool   `orm:"column(sex)"`
-	Email string `orm:"column(email)"`
+	ID      int32  `orm:"column(id);auto"`
+	Name    string `orm:"column(name);unique"`
+	Age     int64  `orm:"column(age)"`
+	Sex     bool   `orm:"column(sex)"`
+	Email   string `orm:"column(email)"`
+	Street  string `orm:"column(street)"`
+	Version string `orm:"column(version)"`
 }
 
-func NewHouse(name, email string, age int64, sex bool) *HouseHood {
+func NewHouse(name, email, street, version string, age int64, sex bool) *HouseHood {
 	return &HouseHood{
-		Name:  name,
-		Age:   age,
-		Sex:   sex,
-		Email: email,
+		Name:    name,
+		Age:     age,
+		Sex:     sex,
+		Email:   email,
+		Street:  street,
+		Version: version,
 	}
 }
 
@@ -42,8 +48,19 @@ func UpdateHouse(house *HouseHood) {
 		data.Email = house.Email
 	}
 
+	if house.Street != "" {
+		data.Street = house.Street
+	}
+
+	if house.Version != "" {
+		data.Version = house.Version
+	}
+
+	if house.Age != 0 {
+		data.Age = house.Age
+	}
+
 	data.Sex = house.Sex
-	data.Age = house.Age
 	res, err := orm.NewOrm().Update(data)
 	if err != nil {
 		log.Fatal(err)
@@ -53,12 +70,32 @@ func UpdateHouse(house *HouseHood) {
 }
 
 func AddHouse(house []*HouseHood) {
-	res, err := orm.NewOrm().InsertMulti(len(house), house)
+	db := orm.NewOrm()
+	//i, err := db.QueryTable("house_hood").Delete()
+	//if err != nil {
+	//	log.Fatal("--------------------", i, err)
+	//}
+
+	begin, err := db.Begin()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println("[-------------insert-----------]:", res, err)
+	exec, err := begin.Raw(fmt.Sprintf("TRUNCATE TABLE %v", "house_hood")).Exec()
+	if err != nil {
+		log.Fatal(exec, err)
+	}
+
+	res, err := begin.InsertMulti(len(house), house)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err = begin.Commit(); err != nil {
+		log.Fatal(err)
+	}
+
+	logs.Error("[-------------insert-----------]:", res, err)
 }
 
 func QueryHouse(house *HouseHood) {
@@ -107,11 +144,43 @@ func QueryHouse(house *HouseHood) {
 	//return res, err
 }
 
-func QueryHouses(house []*HouseHood) {
-	err := orm.NewOrm().Read(house, "age")
+func QueryHouses(page, limit int32, house *HouseHood) []*HouseHood {
+	db := orm.NewOrm()
+	q := db.QueryTable(&HouseHood{})
+	//condition := orm.NewCondition()
+
+	if house.Street != "" {
+		//condition = condition.And("street__icontains", house.Street)
+		q = q.Filter("street__icontains", house.Street)
+	}
+
+	if house.Version != "" {
+		//condition = condition.And("version__icontains", house.Version)
+		q = q.Filter("version__icontains", house.Version)
+	}
+
+	if house.Name != "" {
+		q = q.Filter("name_icontains", house.Name)
+	}
+
+	if house.Sex {
+		q = q.Filter("sex", house.Sex)
+	}
+
+	if house.Email != "" {
+		q = q.Filter("email__icontains", house.Email)
+	}
+
+	if house.Age != 0 {
+		q = q.Filter("age", house.Age)
+	}
+
+	var result []*HouseHood
+	all, err := q.Limit(limit).Offset((page - 1) * limit).OrderBy("-name").All(&result)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Println("[-------------read-----------]:", err)
+	log.Println("[-------------read-----------]:", all, err)
+	return result
 }
