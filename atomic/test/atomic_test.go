@@ -6,6 +6,10 @@ import (
 	"testing"
 )
 
+// ----------------------------------------
+// 对共享整型变量的无锁读写
+// ----------------------------------------
+
 var n1 int64
 
 func addByAtomic(i int64) int64 {
@@ -68,6 +72,64 @@ func BenchmarkReadByRWMutex(b *testing.B) {
 	b.RunParallel(func(pb *testing.PB) {
 		for pb.Next() {
 			readByRWMutex()
+		}
+	})
+}
+
+// ----------------------------------------
+// 对共享自定义类型的读写
+// 结论：
+// 原子操作的无锁并发写的性能随着并发量增大而减小
+// 原子操作的无所并发读的性能随着并发量增大而趋于稳定
+// ----------------------------------------
+
+type Config struct {
+	sync.RWMutex
+	data string
+}
+
+func BenchmarkRWMutexSet(b *testing.B) {
+	config := Config{}
+	b.ReportAllocs()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			config.Lock()
+			config.data = "easy"
+			config.Unlock()
+		}
+	})
+}
+
+func BenchmarkRWMutexGet(b *testing.B) {
+	config := Config{data: "language"}
+	b.ReportAllocs()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			config.RLock()
+			_ = config.data
+			config.RUnlock()
+		}
+	})
+}
+
+func BenchmarkAtomicSet(b *testing.B) {
+	var config atomic.Value
+	a := Config{data: "rust"}
+	b.ReportAllocs()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			config.Store(a)
+		}
+	})
+}
+
+func BenchmarkAtomicGet(b *testing.B) {
+	var config atomic.Value
+	config.Store(Config{data: "treaty"})
+	b.ReportAllocs()
+	b.RunParallel(func(pb *testing.PB) {
+		for pb.Next() {
+			_ = config.Load().(Config)
 		}
 	})
 }
