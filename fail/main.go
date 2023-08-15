@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bufio"
 	"errors"
 	"fmt"
+	"log"
 )
 
 // 如何优雅的处理错误
@@ -41,6 +43,8 @@ func main() {
 	err1 := newWrapError(err)
 	is := errors.Is(err1, err)
 	fmt.Println(is, err1)
+
+	isError()
 }
 
 func newError() error {
@@ -50,3 +54,22 @@ func newError() error {
 func newWrapError(err error) error {
 	return fmt.Errorf("wrap err: %w", err)
 }
+
+func isError() {
+	err := bufio.ErrBufferFull
+	err1 := fmt.Errorf("wrap err1: %w", err)
+	err2 := fmt.Errorf("wrap err1: %w", err1)
+	if errors.Is(err2, bufio.ErrBufferFull) {
+		log.Fatal(bufio.ErrBufferFull)
+	}
+}
+
+// 错误处理策略
+// 1.透明错误处理策略
+// 	 直接return
+// 2.哨兵错误处理策略
+// 	 使用Go官方定义导出的哨兵错误值
+//   eg: bufio.ErrBufferFull
+//   使用Is方法将error类型变量与哨兵错误值进行比较
+//   if err == bufio.ErrBufferFull 等同于 errors.Is(err, bufio.ErrBufferFull)
+//   Is方法会随着错误链向上找到匹配错误值
