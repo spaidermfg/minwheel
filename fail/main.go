@@ -45,6 +45,8 @@ func main() {
 	fmt.Println(is, err1)
 
 	isError()
+
+	testMyError()
 }
 
 func newError() error {
@@ -58,9 +60,9 @@ func newWrapError(err error) error {
 func isError() {
 	err := bufio.ErrBufferFull
 	err1 := fmt.Errorf("wrap err1: %w", err)
-	err2 := fmt.Errorf("wrap err1: %w", err1)
+	err2 := fmt.Errorf("wrap err2: %w", err1)
 	if errors.Is(err2, bufio.ErrBufferFull) {
-		log.Fatal(bufio.ErrBufferFull)
+		log.Println(bufio.ErrBufferFull)
 	}
 }
 
@@ -73,3 +75,27 @@ func isError() {
 //   使用Is方法将error类型变量与哨兵错误值进行比较
 //   if err == bufio.ErrBufferFull 等同于 errors.Is(err, bufio.ErrBufferFull)
 //   Is方法会随着错误链向上找到匹配错误值
+// 3.错误值类型处理策略
+//   使用errors.As()方法,相当于通过类型断言判断一个error类型变量是否为特定的自定义错误类型
+
+type MyError struct {
+	e string
+}
+
+func (e *MyError) Error() string {
+	return e.e
+}
+
+func testMyError() {
+	err := &MyError{e: "this is wrong"}
+	err1 := fmt.Errorf("wrap err1: %w", err)
+	err2 := fmt.Errorf("wrap err2: %w", err1)
+	var e *MyError
+	if errors.As(err2, &e) {
+		fmt.Println("MyError is on the chain of err2")
+		fmt.Println(err == e, err1 == e, err2 == e)
+		return
+	}
+
+	fmt.Println("MyError is not on the chain of err2")
+}
