@@ -154,6 +154,8 @@ func QueryHouse(house *HouseHood) {
 func QueryHouses(page, limit int32, house *HouseHood) []*HouseHood {
 	db := orm.NewOrm()
 	q := db.QueryTable(&HouseHood{})
+	count, _ := q.Count()
+	log.Println("================", count)
 	//condition := orm.NewCondition()
 
 	if house.Street != "" {
