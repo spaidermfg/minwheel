@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
+	"net/http"
 	"net/url"
 	"os"
 	"os/signal"
@@ -52,5 +53,46 @@ func TestWebSocket(t *testing.T) {
 		}
 
 		return
+	}
+}
+
+func TestWebSocketServer(t *testing.T) {
+	http.HandleFunc("/ws/server", webSocketServer)
+	err := http.ListenAndServe(":6767", nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
+}
+
+func webSocketServer(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+
+	for {
+		time.Sleep(time.Second)
+		messageType, p, err := conn.ReadMessage()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		message := []byte(fmt.Sprintf("你好， %v", string(p)))
+		pm, err := websocket.NewPreparedMessage(messageType, message)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = conn.WritePreparedMessage(pm)
+		if err != nil {
+			log.Fatal()
+		}
+		log.Println("[=================: Write Message!]")
 	}
 }
