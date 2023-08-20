@@ -96,3 +96,32 @@ func webSocketServer(w http.ResponseWriter, r *http.Request) {
 		log.Println("[=================: Write Message!]")
 	}
 }
+
+func TestWebSocketClient(t *testing.T) {
+	u := url.URL{
+		Scheme: "ws",
+		Host:   "127.0.0.1:6767",
+		Path:   "/ws/server",
+	}
+	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer conn.Close()
+
+	a := []byte("李银河")
+	for {
+		err := conn.WriteMessage(websocket.TextMessage, a)
+		if err != nil {
+			log.Println(err)
+		}
+
+		_, p, err := conn.ReadMessage()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		a = p
+		log.Println("Receive message:", string(p))
+	}
+}
