@@ -4,7 +4,10 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io"
 	"log"
+	"os"
+	"path/filepath"
 )
 
 // 如何优雅的处理错误
@@ -47,6 +50,9 @@ func main() {
 	isError()
 
 	testMyError()
+
+	err = CopyFile("./fail/a.txt", "./fail/b.txt")
+	check(err)
 }
 
 func newError() error {
@@ -98,4 +104,46 @@ func testMyError() {
 	}
 
 	fmt.Println("MyError is not on the chain of err2")
+}
+
+func check(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
+func CopyFile(src, dst string) (err error) {
+	var r, w *os.File
+
+	defer func() {
+		if r != nil {
+			r.Close()
+		}
+
+		if w != nil {
+			w.Close()
+		}
+
+		if e := recover(); e != nil {
+			if w != nil {
+				os.Remove(dst)
+			}
+			err = fmt.Errorf("copy %s %s: %v", src, dst, err)
+		}
+	}()
+
+	abs, err := filepath.Abs(".")
+	check(err)
+	log.Println(abs)
+
+	r, err = os.Open(src)
+	check(err)
+
+	w, err = os.Create(dst)
+	check(err)
+
+	_, err = io.Copy(w, r)
+	check(err)
+
+	return nil
 }
