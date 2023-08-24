@@ -65,13 +65,13 @@ func TestQuery(t *testing.T) {
 	q := &models.HouseHood{
 		//Name:    "",
 		//Age: 10,
-		Sex: true,
+		//Sex: true,
 		//Email: "b",
-		Street: "o",
+		Street: "z",
 		//Version: "v",
 	}
 
-	houses := models.QueryHouses(1, 4, q)
+	houses := models.QueryHouses(1, 20, q)
 	log.Println("len:", len(houses))
 	if len(houses) > 0 {
 		for k, v := range houses {
