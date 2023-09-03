@@ -1,4 +1,6 @@
-package Command
+package main
+
+import "fmt"
 
 // 命令模式
 // 将请求转化为一个包含与请求相关的所有信息的独立对象
@@ -48,3 +50,38 @@ type Device interface {
 	off()
 }
 
+type Tv struct {
+	isRunning bool
+}
+
+func (t *Tv) on() {
+	t.isRunning = true
+	fmt.Println("TV is running.")
+}
+
+func (t *Tv) off() {
+	t.isRunning = false
+	fmt.Println("TV is shutdown.")
+}
+
+func main() {
+	tv := &Tv{}
+
+	onTv := &OnCommand{
+		device: tv,
+	}
+
+	offTv := &OffCommand{
+		device: tv,
+	}
+
+	onButton := &Button{
+		command: onTv,
+	}
+	onButton.press()
+
+	offButton := &Button{
+		command: offTv,
+	}
+	offButton.press()
+}
