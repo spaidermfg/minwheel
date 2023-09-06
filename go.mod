@@ -7,8 +7,10 @@ require (
 	github.com/dlintw/goconf v0.0.0-20120228082610-dcc070983490
 	github.com/gorilla/websocket v1.5.0
 	github.com/jacobsa/go-serial v0.0.0-20180131005756-15cf729a72d4
+	github.com/k0kubun/go-ansi v0.0.0-20180517002512-3bf9e2903213
 	github.com/mattn/go-sqlite3 v1.14.15
 	github.com/natefinch/lumberjack v2.0.0+incompatible
+	github.com/schollz/progressbar/v3 v3.13.1
 	github.com/tarm/serial v0.0.0-20180830185346-98f6abe2eb07
 	go.bug.st/serial v1.5.0
 	go.uber.org/zap v1.23.0
@@ -18,10 +20,15 @@ require (
 
 require (
 	github.com/creack/goselect v0.1.2 // indirect
+	github.com/mattn/go-isatty v0.0.17 // indirect
+	github.com/mattn/go-runewidth v0.0.15 // indirect
+	github.com/mitchellh/colorstring v0.0.0-20190213212951-d06e56a500db // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/stretchr/testify v1.8.4 // indirect
 	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.11.0 // indirect
+	golang.org/x/sys v0.12.0 // indirect
+	golang.org/x/term v0.12.0 // indirect
 )
 
 require (
