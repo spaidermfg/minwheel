@@ -22,7 +22,7 @@ func ProgressBarOption() {
 		//progressbar.OptionShowBytes(true),
 		progressbar.OptionSetWidth(50),
 		//progressbar.OptionShowCount(),
-		progressbar.OptionSetDescription("[cyan][1/5][reset] [yellow]Reading book[reset]"),
+		progressbar.OptionSetDescription("[_yellow_][1/5][reset] [_magenta_]Reading book[reset]"),
 		//progressbar.OptionSetElapsedTime(false),
 		progressbar.OptionShowElapsedTimeOnFinish(),
 		//progressbar.OptionSpinnerType(1),
@@ -31,23 +31,23 @@ func ProgressBarOption() {
 			Saucer:        "[green]█[reset]",
 			SaucerHead:    "[green][reset]",
 			SaucerPadding: " ",
-			BarStart:      "[reset]|[reset]",
-			BarEnd:        "[reset]|[reset]",
+			BarStart:      "|",
+			BarEnd:        "|",
 		}))
 
 	bar.Add(200)
 	time.Sleep(time.Second * 2)
 	bar.Add(200)
-	bar.Describe("[cyan][2/5][reset] [yellow]Listen music[reset]")
+	bar.Describe("[_yellow_][2/5][reset] [_magenta_]Listen music[reset]")
 	time.Sleep(time.Second * 2)
 	bar.Add(200)
-	bar.Describe("[cyan][3/5][reset] [yellow]Watch movie[reset]")
+	bar.Describe("[_yellow_][3/5][reset] [_magenta_]Watch movie[reset]")
 	time.Sleep(time.Second * 2)
 	bar.Add(200)
-	bar.Describe("[cyan][4/5][reset] [yellow]Play game[reset]")
+	bar.Describe("[_yellow_][4/5][reset] [_magenta_]Play game[reset]")
 	time.Sleep(time.Second * 2)
 	//bar.Add(200)
-	bar.Describe("[cyan][5/5][reset] [yellow]ready sleep[reset]")
+	bar.Describe("[_yellow_][5/5][reset] [_magenta_]ready sleep[reset]")
 	bar.Finish()
 	//bar.Close()
 }
