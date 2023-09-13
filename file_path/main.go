@@ -6,6 +6,8 @@ import (
 )
 
 func main() {
-	path := "red (1).csv"
+	path := "/a/b/c/red (1).csv"
 	fmt.Println(filepath.Ext(path))
+
+	fmt.Println(filepath.Base(path))
 }
