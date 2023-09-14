@@ -15,4 +15,18 @@ func main() {
 			fmt.Println(i)
 		}
 	}
+
+	exists("a")
+	exists("b")
+	exists("c")
+}
+
+var m = map[string]string{"a": "a", "b": "b"}
+
+func exists(str string) {
+	if s, ok := m[str]; ok {
+		fmt.Println("-------exists", s)
+	} else {
+		fmt.Println("-------no", ok)
+	}
 }
