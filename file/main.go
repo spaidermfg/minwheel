@@ -20,7 +20,9 @@ func main() {
 	//changeContent()
 	//deleteBadLine()
 
-	useDirect()
+	//useDirect()
+
+	useAbstractWrite()
 }
 
 func findBadLine() {
@@ -202,5 +204,49 @@ func useDirect() {
 
 		fmt.Printf("read %d bytes from file: %q\n", content, buf)
 
+	}
+}
+
+// 写入抽象数据类型
+
+type Player struct {
+	name   string
+	age    int
+	gender string
+}
+
+func directWriteToFile(path string, players []*Player) error {
+	create, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		create.Sync()
+		create.Close()
+	}()
+
+	for _, player := range players {
+		_, err = fmt.Fprintf(create, "%s\n", player)
+		if err != nil {
+			return err
+		}
+
+	}
+
+	return err
+}
+
+func useAbstractWrite() {
+	players := []*Player{
+		{"tom", 22, "man"},
+		{"mark", 23, "women"},
+		{"dylan", 24, "man"},
+		{"frank", 25, "women"},
+	}
+
+	err := directWriteToFile("./ab.txt", players)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
