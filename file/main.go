@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -17,7 +18,9 @@ func main() {
 	// fmt.Println(normalPath)
 	//findBadLine()
 	//changeContent()
-	deleteBadLine()
+	//deleteBadLine()
+
+	useDirect()
 }
 
 func findBadLine() {
@@ -127,4 +130,77 @@ func deleteBadLine() {
 	//处理完毕，将新创建的文件重命名
 	//其他系统需要先删除源文件
 	os.Rename(NEWFILE, FILE)
+}
+
+func directWriteBytesToFile(path string, data []byte) (int, error) {
+	if path == "" {
+		return 0, errors.New("path is null")
+	}
+
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND|os.O_SYNC, 0666)
+	if err != nil {
+		return 0, err
+	}
+
+	defer func() {
+		file.Close()
+		file.Sync()
+	}()
+
+	return file.Write(data)
+}
+
+func directReadBytesFromFile(path string, data []byte) (int, error) {
+	if path == "" {
+		return 0, errors.New("path is null")
+	}
+
+	file, err := os.Open(path)
+	if err != nil {
+		return 0, err
+	}
+	defer file.Close()
+
+	return file.Read(data)
+}
+
+func useDirect() {
+	file := "./foo.txt"
+	text := "Find basic SPL concepts in this post: SPL concepts for beginners. For beginners, \n" +
+		"you can find characteristic basic computations of SPL in SPL Operations for Beginners. \n" +
+		"Experienced programmers can quickly understand the differences between SPL and SQL. \n" +
+		"A software architect can understand the differences between SPL and traditional databases after reading Q&A of esProc Architecture. \n"
+	n, err := directWriteBytesToFile(file, []byte(text))
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("write %d bytes to %s\n", n, file)
+
+	buf := make([]byte, 38)
+	_, err = directReadBytesFromFile(file, buf)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	open, err := os.Open(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer open.Close()
+
+	for {
+		content, err1 := open.Read(buf)
+		if err1 == io.EOF {
+			fmt.Println("read meets EOF")
+			break
+		}
+
+		if err1 != nil {
+			fmt.Println("read file error:", err1)
+			return
+		}
+
+		fmt.Printf("read %d bytes from file: %q\n", content, buf)
+
+	}
 }

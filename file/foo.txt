@@ -1,0 +1,4 @@
+Find basic SPL concepts in this post: SPL concepts for beginners. For beginners, 
+you can find characteristic basic computations of SPL in SPL Operations for Beginners. 
+Experienced programmers can quickly understand the differences between SPL and SQL. 
+A software architect can understand the differences between SPL and traditional databases after reading Q&A of esProc Architecture. 
