@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"log"
+	"reflect"
+	"sync"
 	"unsafe"
 )
 
@@ -13,6 +15,7 @@ import (
 // 使用unsafe包可以实现性能更高，与底层系统交互更容易的低级代码，但同样也有风险。
 // ArbitraryType 表示一个任意表达式的类型，仅用于文档使用
 // 使用场景 绕过类型保护直接操作内存，对性能敏感，与os或c交互
+// 反射中TypeOf和ValueOf,将任意类型变量转换为一个interface类型，再转换为reflect.emptyInterface类型
 
 func main() {
 	log.Println("")
@@ -40,6 +43,9 @@ func main() {
 	fmt.Println(x.b)
 
 	through()
+	reflectUnsafe()
+	syncUnsafe()
+	typeChange()
 }
 
 type People struct {
@@ -58,4 +64,43 @@ func through() {
 	b[2] = 0x25
 	b[3] = 0x26
 	fmt.Printf("0x%x\n", a)
+}
+
+type Ide struct {
+	Name  string
+	Speed int32
+}
+
+func reflectUnsafe() {
+	ide := &Ide{
+		Name:  "clion",
+		Speed: 7,
+	}
+
+	wType := reflect.TypeOf(ide)
+	fmt.Println(wType.Elem().Kind().String())
+}
+
+func syncUnsafe() {
+	pool := sync.Pool{}
+	pool.Put("b")
+	pool.Put([]int32{1, 2, 3, 434, 4})
+	fmt.Println(pool.Get())
+	fmt.Println(pool.Get())
+}
+
+func typeChange() {
+	//byte[] -> string
+	b := []byte{'a', 'b', 'c', 'd', 'e'}
+	bp := unsafe.Pointer(&b)
+
+	var s string
+	s = *(*string)(bp)
+	fmt.Println(s)
+
+	//string -> byte[]
+	sp := unsafe.Pointer(&s)
+	var b1 []byte
+	b1 = *(*[]byte)(sp)
+	fmt.Println(b1)
 }
