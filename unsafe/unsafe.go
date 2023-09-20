@@ -46,6 +46,7 @@ func main() {
 	reflectUnsafe()
 	syncUnsafe()
 	typeChange()
+	pointAlgo()
 }
 
 type People struct {
@@ -103,4 +104,11 @@ func typeChange() {
 	var b1 []byte
 	b1 = *(*[]byte)(sp)
 	fmt.Println(b1)
+}
+
+func pointAlgo() {
+	// 访问数组第四个元素
+	a := [10]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 0}
+	p := unsafe.Pointer(uintptr(unsafe.Pointer(&a)) + 3*unsafe.Sizeof(a[0]))
+	fmt.Println(*(*int)(p))
 }
