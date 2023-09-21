@@ -215,6 +215,10 @@ type Player struct {
 	gender string
 }
 
+func (p Player) String() string {
+	return fmt.Sprintf("%v %v %v", p.name, p.gender, p.age)
+}
+
 func directWriteToFile(path string, players []*Player) error {
 	create, err := os.Create(path)
 	if err != nil {
@@ -249,4 +253,41 @@ func useAbstractWrite() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	player, err := backToAb("./ab.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, ab := range player {
+		fmt.Println(ab.name, ab.gender, ab.age)
+	}
+}
+
+func backToAb(path string) ([]*Player, error) {
+	open, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+
+	players := make([]*Player, 0)
+	//player := &Player{}
+
+	for {
+		var player Player
+		_, err = fmt.Fscanf(open, "%s %s %d", &player.name, &player.gender, &player.age)
+		if err == io.EOF {
+			fmt.Println("read meet EOF")
+			return players, nil
+		}
+
+		if err != nil {
+			fmt.Println("read file error:", err)
+			return nil, err
+		}
+
+		players = append(players, &player)
+	}
+
+	return players, err
 }
