@@ -231,6 +231,7 @@ func directWriteToFile(path string, players []*Player) error {
 	}()
 
 	for _, player := range players {
+		// 写
 		_, err = fmt.Fprintf(create, "%s\n", player)
 		if err != nil {
 			return err
@@ -275,6 +276,7 @@ func backToAb(path string) ([]*Player, error) {
 
 	for {
 		var player Player
+		// 读
 		_, err = fmt.Fscanf(open, "%s %s %d", &player.name, &player.gender, &player.age)
 		if err == io.EOF {
 			fmt.Println("read meet EOF")
