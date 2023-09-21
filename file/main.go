@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"io"
@@ -263,6 +264,9 @@ func useAbstractWrite() {
 	for _, ab := range player {
 		fmt.Println(ab.name, ab.gender, ab.age)
 	}
+
+	//binary
+	useBinary()
 }
 
 func backToAb(path string) ([]*Player, error) {
@@ -291,5 +295,49 @@ func backToAb(path string) ([]*Player, error) {
 		players = append(players, &player)
 	}
 
-	return players, err
+	//return players, err
+}
+
+///  ---------------------------binary read & write
+
+type Student struct {
+	Name   [20]byte
+	Age    int8
+	Gender [6]byte
+}
+
+func binaryWriteToFile(path string, students []Student) error {
+	create, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+
+	for _, v := range students {
+		if err = binary.Write(create, binary.BigEndian, &v); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func useBinary() {
+	var students [3]Student
+
+	copy(students[0].Name[:], "Tommy")
+	copy(students[1].Name[:], "Mark")
+	copy(students[2].Name[:], "Rank")
+
+	copy(students[0].Gender[:], "man")
+	copy(students[1].Gender[:], "women")
+	copy(students[2].Gender[:], "man")
+
+	students[0].Age = 18
+	students[1].Age = 19
+	students[2].Age = 10
+
+	err := binaryWriteToFile("./bin.txt", students[:])
+	if err != nil {
+		log.Fatal(err)
+	}
 }
