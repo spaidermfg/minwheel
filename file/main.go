@@ -274,6 +274,7 @@ func backToAb(path string) ([]*Player, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer open.Close()
 
 	players := make([]*Player, 0)
 	//player := &Player{}
@@ -311,6 +312,7 @@ func binaryWriteToFile(path string, students []Student) error {
 	if err != nil {
 		return err
 	}
+	defer create.Close()
 
 	for _, v := range students {
 		if err = binary.Write(create, binary.BigEndian, &v); err != nil {
@@ -319,6 +321,32 @@ func binaryWriteToFile(path string, students []Student) error {
 	}
 
 	return nil
+}
+
+func binaryReadFromFile(path string) ([]*Student, error) {
+	open, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer open.Close()
+
+	students := make([]*Student, 0)
+
+	for {
+		var student Student
+		// 大端字节序
+		err = binary.Read(open, binary.BigEndian, &student)
+		if err == io.EOF {
+			fmt.Println("read meet EOF")
+			return students, nil
+		}
+
+		if err != nil {
+			return nil, err
+		}
+
+		students = append(students, &student)
+	}
 }
 
 func useBinary() {
@@ -339,5 +367,14 @@ func useBinary() {
 	err := binaryWriteToFile("./bin.txt", students[:])
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	stus, err := binaryReadFromFile("./bin.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, stu := range stus {
+		fmt.Printf("--- %s %s %d\n", stu.Name, stu.Gender, stu.Age)
 	}
 }
