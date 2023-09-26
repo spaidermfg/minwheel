@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"encoding/binary"
+	"encoding/gob"
 	"errors"
 	"fmt"
 	"io"
@@ -267,6 +268,9 @@ func useAbstractWrite() {
 
 	//binary
 	useBinary()
+
+	//gob
+	useGob()
 }
 
 func backToAb(path string) ([]*Player, error) {
@@ -376,5 +380,43 @@ func useBinary() {
 
 	for _, stu := range stus {
 		fmt.Printf("--- %s %s %d\n", stu.Name, stu.Gender, stu.Age)
+	}
+}
+
+// gob Decode & Encode
+
+type Portrait struct {
+	Light     string
+	Color     int8
+	Structure string
+}
+
+func gobWriteToFile(path string, portrait []*Portrait) error {
+	create, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer create.Close()
+
+	encoder := gob.NewEncoder(create)
+	for _, p := range portrait {
+		if err = encoder.Encode(p); err != nil {
+			return err
+		}
+	}
+
+	return err
+}
+
+func useGob() {
+	portraits := []*Portrait{
+		{"open", 89, "二八"},
+		{"close", 34, "三八"},
+		{"close", 56, "curve"},
+	}
+
+	err := gobWriteToFile("./gob.txt", portraits)
+	if err != nil {
+		log.Fatal(err)
 	}
 }
