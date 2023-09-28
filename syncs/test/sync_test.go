@@ -193,4 +193,11 @@ func TestSyncMap(t *testing.T) {
 	if actual, ok := sm.LoadOrStore("a", true); ok {
 		fmt.Printf("%v is exists\n", actual)
 	}
+
+	sm = sync.Map{}
+
+	fmt.Println(sm.Load("b"))
+	if actual, ok := sm.LoadOrStore("a", true); ok {
+		fmt.Printf("%v is exists\n", actual)
+	}
 }
