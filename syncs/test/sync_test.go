@@ -2,6 +2,7 @@ package test
 
 import (
 	"bytes"
+	"fmt"
 	"log"
 	"sync"
 	"testing"
@@ -170,4 +171,26 @@ func BenchmarkWithNew(b *testing.B) {
 	}
 
 	log.Println(64 << 10)
+}
+
+// sync.Map{}
+
+var sm = sync.Map{}
+
+func TestSyncMap(t *testing.T) {
+	sm.Store("a", true)
+	sm.Store("b", true)
+	sm.Store("c", true)
+	sm.Store("d", true)
+	sm.Store("e", true)
+
+	actual1, ok1 := sm.LoadOrStore("f", true)
+	fmt.Println("ok1L", ok1)
+	if ok1 {
+		fmt.Printf("%v is exists\n", actual1)
+	}
+
+	if actual, ok := sm.LoadOrStore("a", true); ok {
+		fmt.Printf("%v is exists\n", actual)
+	}
 }
