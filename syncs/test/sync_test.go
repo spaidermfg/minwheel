@@ -203,6 +203,8 @@ func TestSyncMap(t *testing.T) {
 	}
 }
 
+// 活锁
+// 正在执行并发操作的程序，但是这些程序无法向前推进程序的状态
 func TestLiveLock(t *testing.T) {
 	cadence := sync.NewCond(&sync.Mutex{})
 	go func() {
@@ -260,5 +262,52 @@ func TestLiveLock(t *testing.T) {
 	wg.Add(2)
 	go walk(&wg, "Alice")
 	go walk(&wg, "Barbara")
+	wg.Wait()
+}
+
+// 饥饿
+// 一个或多个贪婪的并发进程，不公平地阻止一个或多个并发进程
+func TestHunger(t *testing.T) {
+	var wg sync.WaitGroup
+	var sharedLock sync.Mutex
+	const runtime = 1 * time.Second
+
+	greedyWorker := func() {
+		defer wg.Done()
+
+		var count int
+		for begin := time.Now(); time.Since(begin) <= runtime; {
+			sharedLock.Lock()
+			time.Sleep(3 * time.Nanosecond)
+			sharedLock.Unlock()
+			count++
+		}
+		fmt.Printf("Greedy worker was able to execute %v work loops\n", count)
+	}
+
+	politeWorker := func() {
+		defer wg.Done()
+
+		var count int
+		for begin := time.Now(); time.Since(begin) <= runtime; {
+			sharedLock.Lock()
+			time.Sleep(1 * time.Nanosecond)
+			sharedLock.Unlock()
+
+			sharedLock.Lock()
+			time.Sleep(1 * time.Nanosecond)
+			sharedLock.Unlock()
+
+			sharedLock.Lock()
+			time.Sleep(1 * time.Nanosecond)
+			sharedLock.Unlock()
+			count++
+		}
+		fmt.Printf("Polite worker was able to execute %v work loops\n", count)
+	}
+
+	wg.Add(2)
+	go greedyWorker()
+	go politeWorker()
 	wg.Wait()
 }
