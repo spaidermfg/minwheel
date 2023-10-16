@@ -13,4 +13,6 @@ func printBit() {
 	i = 67 << 2
 	fmt.Printf("十进制：%d,二进制：%b\n", i, i)
 
+	i = i | 0000000011
+	fmt.Printf("十进制：%d,二进制：%b\n", i, i)
 }
