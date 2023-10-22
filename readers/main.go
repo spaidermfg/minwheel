@@ -1,10 +1,64 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/chzyer/readline"
 	"log"
+	"os/exec"
 	"strings"
+	"sync"
+	"time"
+)
+
+type Deploy struct {
+	host *Host
+	task *Task
+
+	date time.Time
+	ch   chan struct{}
+	ctx  context.Context
+	wg   *sync.WaitGroup
+	mu   sync.Mutex
+}
+
+type Task struct {
+	name     string
+	property string
+	absPath  string
+	port     string
+	branch   string
+}
+
+type Host struct {
+	host     string
+	port     string
+	user     string
+	arch     string
+	password string
+}
+
+const (
+	// cmd
+	ls      = "ls" // ls task, ls
+	cd      = "cd"
+	gen     = "gen"
+	run     = "run"
+	help    = "help"
+	down    = "down" // download task to local
+	exit    = "exit"
+	build   = "build"
+	history = "history"
+	push    = "push" // option: store,remote
+
+	// file property
+	text   = "text"
+	binary = "binary"
+
+	// arch
+	arm   = "arm"
+	amd64 = "amd64"
+	arm64 = "arm64"
 )
 
 var app = []string{"keyboard", "mouse", "video"}
@@ -36,6 +90,7 @@ func main() {
 			if fields[0] == "ls" {
 				for i, s := range app {
 					fmt.Println(i, s)
+					stdout()
 				}
 			}
 
@@ -54,5 +109,15 @@ func main() {
 			plat := strings.Join(fields[2:], "")
 			fmt.Printf("%v %v %v\n", build, branch, plat)
 		}
+	}
+}
+
+func stdout() func() {
+	cmd := exec.Command("ls")
+	bytes, err := cmd.Output()
+	fmt.Println(string(bytes), err)
+
+	return func() {
+		fmt.Println("return func")
 	}
 }
