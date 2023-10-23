@@ -59,6 +59,41 @@ func TestContainsFunc(t *testing.T) {
 	fmt.Println("a containsFunc b?", containsFunc)
 }
 
+// rune 表示Unicode类型
+func TestContainsRune(t *testing.T) {
+	a := "Beautiful"
+	containsRune := strings.ContainsRune(a, 66)
+	fmt.Println("a containsFunc b?", containsRune)
+	fmt.Printf("byte: %v\n", []byte(a))
+}
+
+// if empty, returns +1
+func TestCount(t *testing.T) {
+	a := "Beautiful"
+	b := "u"
+	count := strings.Count(a, b)
+	fmt.Println("count:", count)
+}
+
+// if not found， return all
+func TestCut(t *testing.T) {
+	cut := func(a, b string) {
+		before, after, found := strings.Cut(a, b)
+		fmt.Printf("all: %v,before: %v, after: %v, founc: %v\n", a, before, after, found)
+	}
+
+	a := "Beautiful"
+	cut(a, "u")
+	cut(a, "ti")
+	cut(a, "gb")
+
+}
+
+func TestC(t *testing.T) {
+	a := "Beautiful"
+	strings.CutPrefix(a, "")
+}
+
 //func TestC(t *testing.T) {
 //	strings.Compare()
 //}
