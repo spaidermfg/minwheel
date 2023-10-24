@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"unicode"
 	"unsafe"
 )
 
@@ -67,7 +68,7 @@ func TestContainsRune(t *testing.T) {
 	fmt.Printf("byte: %v\n", []byte(a))
 }
 
-// if empty, returns +1
+// 计算字符串中子子字符串的数量，如果不存在，则返回字符串总长度+1
 func TestCount(t *testing.T) {
 	a := "Beautiful"
 	b := "u"
@@ -87,21 +88,214 @@ func TestCut(t *testing.T) {
 	cut(a, "ti")
 	cut(a, "gb")
 
+	// 	output:
+	//	all: Beautiful,before: Bea, after: tiful, founc: true
+	//	all: Beautiful,before: Beau, after: ful, founc: true
+	//	all: Beautiful,before: Beautiful, after: , founc: false
 }
 
-func TestC(t *testing.T) {
+// 根据前缀子字符串裁切字符串，返回后缀字符串以及布尔值
+func TestCutPrefix(t *testing.T) {
 	a := "Beautiful"
-	strings.CutPrefix(a, "")
+	after, found := strings.CutPrefix(a, "Be")
+	fmt.Printf("after: %v, found: %v\n", after, found)
+}
+
+// 根据后缀子字符串裁切字符串，返回前缀字符串以及布尔值
+func TestCutSuffix(t *testing.T) {
+	a := "Beautiful"
+	before, found := strings.CutSuffix(a, "ful")
+	fmt.Printf("before: %v, found: %v\n", before, found)
+}
+
+// 比较字符串是否一致，不区分大小写
+func TestEqualFold(t *testing.T) {
+	a := "Beautiful"
+	b := "bEAUTIFUL"
+	fold := strings.EqualFold(a, b)
+	fmt.Printf("%v=%v?: %v\n", a, b, fold)
+}
+
+// 将以空格分隔的字符串转化为字符串数组
+func TestFields(t *testing.T) {
+	a := "Bea uti ful"
+	fields := strings.Fields(a)
+	fmt.Printf("fields: %v, len: %v\n", fields, len(fields))
+}
+
+func TestFieldsFunc(t *testing.T) {
+	a := "bea;uti;ful..."
+	fields := strings.FieldsFunc(a, func(r rune) bool {
+		return !unicode.IsLower(r) && !unicode.IsNumber(r)
+	})
+	fmt.Printf("fields: %v, len: %v\n", fields, len(fields))
+}
+
+// 检索字符串前缀是否包含某子字符串，返回布尔值
+func TestHasPrefix(t *testing.T) {
+	a := "Beautiful"
+	prefix := strings.HasPrefix(a, "Be")
+	fmt.Printf("prefix: %v\n", prefix)
+
+	//	output:
+	//	prefix: true
+}
+
+// 检索字符串后缀是否包含某子字符串，返回布尔值
+func TestHasSuffix(t *testing.T) {
+	a := "Beautiful"
+	suffix := strings.HasSuffix(a, "ful")
+	fmt.Printf("suffix: %v\n", suffix)
+
+	//	output:
+	//	suffix: true
+}
+
+// 返回子字符串的下标，如果不存在则返回-1
+func TestIndex(t *testing.T) {
+	a := "Beautiful"
+	b := "u"
+	index := strings.Index(a, b)
+	fmt.Printf("all: %v, son: %v, index: %v\n", a, b, index)
+
+	b = "m"
+	index = strings.Index(a, b)
+	fmt.Printf("all: %v, son: %v, index: %v\n", a, b, index)
+
+	//	output:
+	//	all: Beautiful, son: u, index: 3
+	//	all: Beautiful, son: m, index: -1
+
+}
+
+// 返回子字符串中第一个存在于父字符串中的下标
+func TestIndexAny(t *testing.T) {
+	a := "Beautiful"
+	b := "mat"
+	index := strings.IndexAny(a, b)
+	fmt.Printf("all: %v, son: %v, index: %v\n", a, b, index)
+
+	//	output:
+	//	all: Beautiful, son: mat, index: 2
+}
+
+// 返回字节在字符串中的位置下标, 不存在返回-1
+func TestIndexByte(t *testing.T) {
+	a := "Beautiful"
+	index := strings.IndexByte(a, 't')
+	fmt.Printf("all: %v, son: %v, index: %v\n", a, 't', index)
+
+	//	output:
+	//	all: Beautiful, son: 116, index: 4
+}
+
+// 根据自定义检索规则返回子字符串在字符串中的下标位置
+func TestIndexFunc(t *testing.T) {
+	a := "Beau7长城tiful"
+	index := strings.IndexFunc(a, func(r rune) bool {
+		return unicode.Is(unicode.Han, r)
+	})
+	fmt.Printf("all: %v, son: %v, index: %v\n", a, '长', index)
+
+	//	output:
+	//	all: Beau7长城tiful, son: 38271, index: 5
+}
+
+// 返回unicode字符在字符串中的下标位置
+func TestIndexRune(t *testing.T) {
+	a := "Beautiful"
+	index := strings.IndexRune(a, 'i')
+	fmt.Printf("all: %v, son: %v, index: %v\n", a, 'i', index)
+
+	//	output:
+	//	all: Beautiful, son: 105, index: 5
+}
+
+// 使用指定分隔符组合字符串数组
+func TestJoin(t *testing.T) {
+	a := []string{"I", "love", "you."}
+	b := " "
+	join := strings.Join(a, b)
+	fmt.Printf("join: %v\n", join)
+
+	//	output:
+	//	join: I love you.
+}
+
+// 返回子字符串在父字符串中最后匹配的下标位置
+func TestLastIndex(t *testing.T) {
+	a := "Beautiful"
+	b := "u"
+	lastIndex := strings.LastIndex(a, b)
+	firstIndex := strings.Index(a, b)
+	fmt.Printf("all: %v, son: %v, first index: %v, last index: %v\n", a, b, firstIndex, lastIndex)
+
+	//	output:
+	//	all: Beautiful, son: u, first index: 3, last index: 7
 }
 
 //func TestC(t *testing.T) {
-//	strings.Compare()
+//	strings.
 //}
 
-//func TestC(t *testing.T) {
-//	strings.Compare()
+//	func TestC(t *testing.T) {
+//		strings
+//	}
+//
+//	func TestC(t *testing.T) {
+//		strings
+//	}
+//
+//func TestMap(t *testing.T) {
+//	a := "Beautiful"
+//	s := strings.Map(func(r rune) rune {
+//
+//	}, a)
+//	fmt.Printf("s: %v\n", s)
 //}
 
-//func TestC(t *testing.T) {
-//	strings.Compare()
-//}
+// 返回字符串s重复n次的字符串
+func TestRepeat(t *testing.T) {
+	a := "Beautiful"
+	repeat := strings.Repeat(a, 3)
+	fmt.Printf("repeat: %v\n", repeat)
+
+	//	output:
+	//	repeat: BeautifulBeautifulBeautiful
+}
+
+// 根据count数替换检索到的old字符串，count=-1替换所有检索到的字符串
+func TestC(t *testing.T) {
+	a := strings.Repeat("Beautiful", 4)
+	old := "ea"
+	newer := "ae"
+	replace := strings.Replace(a, old, newer, 2)
+	fmt.Printf("replace2: %v\n", replace)
+
+	replace = strings.Replace(a, old, newer, -1)
+	fmt.Printf("replace-1: %v\n", replace)
+
+	//	output:
+	//	replace2: BaeutifulBaeutifulBeautifulBeautiful
+	//	replace-1: BaeutifulBaeutifulBaeutifulBaeutiful
+}
+
+//	func TestC(t *testing.T) {
+//		strings
+//	}
+
+//	func TestC(t *testing.T) {
+//		strings
+//	}
+
+//	func TestC(t *testing.T) {
+//		strings
+//	}
+
+//	func TestC(t *testing.T) {
+//		strings
+//	}
+
+//	func TestC(t *testing.T) {
+//		strings
+//	}
