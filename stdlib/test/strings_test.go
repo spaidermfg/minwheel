@@ -429,6 +429,9 @@ func TestTrimLeftFunc(t *testing.T) {
 	})
 
 	fmt.Printf("origin: %v, left: %v\n", a, left)
+
+	//	output:
+	//	origin: +-+Beautiful-+-, left: Beautiful-+-
 }
 
 // cut掉字符串指定的前缀字符串，返回cut后的字符串
@@ -460,7 +463,7 @@ func TestTrimRightFunc(t *testing.T) {
 	right := strings.TrimRightFunc(a, func(r rune) bool {
 		return !unicode.IsNumber(r) && !unicode.IsLetter(r)
 	})
-	fmt.Printf("origin: %v, right: %v", a, right)
+	fmt.Printf("origin: %v, right: %v\n", a, right)
 
 	//	output:
 	//	origin: +-+Beautiful-+-, right: +-+Beautiful
