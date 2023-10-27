@@ -241,11 +241,15 @@ func TestLastIndex(t *testing.T) {
 //	func TestC(t *testing.T) {
 //		strings
 //	}
-//
+
 //	func TestC(t *testing.T) {
 //		strings
 //	}
-//
+
+//	func TestC(t *testing.T) {
+//		strings
+//	}
+
 //func TestMap(t *testing.T) {
 //	a := "Beautiful"
 //	s := strings.Map(func(r rune) rune {
@@ -253,6 +257,14 @@ func TestLastIndex(t *testing.T) {
 //	}, a)
 //	fmt.Printf("s: %v\n", s)
 //}
+
+//	func TestC(t *testing.T) {
+//		strings
+//	}
+
+//	func TestC(t *testing.T) {
+//		strings
+//	}
 
 // 返回字符串s重复n次的字符串
 func TestRepeat(t *testing.T) {
@@ -265,7 +277,7 @@ func TestRepeat(t *testing.T) {
 }
 
 // 根据count数替换检索到的old字符串，count=-1替换所有检索到的字符串
-func TestC(t *testing.T) {
+func TestReplace(t *testing.T) {
 	a := strings.Repeat("Beautiful", 4)
 	old := "ea"
 	newer := "ae"
@@ -280,9 +292,41 @@ func TestC(t *testing.T) {
 	//	replace-1: BaeutifulBaeutifulBaeutifulBaeutiful
 }
 
-//	func TestC(t *testing.T) {
-//		strings
-//	}
+// 替换所有匹配到的字符串
+func TestReplaceAll(t *testing.T) {
+	a := strings.Repeat("Beautiful", 4)
+	old := "ea"
+	newer := "ae"
+	replace := strings.ReplaceAll(a, old, newer)
+	fmt.Printf("replace: %v\n", replace)
+
+	//	output:
+	//	replace: BaeutifulBaeutifulBaeutifulBaeutiful
+}
+
+// 根据标志符分隔字符串，返回分隔后不包含标志符的字符串数组
+func TestSplit(t *testing.T) {
+	a := "Beautiful space"
+	sep := " "
+	split := strings.Split(a, sep)
+	fmt.Printf("all: %v, sep: %v, split: %v\n", a, sep, split)
+
+	//	output:
+	//	all: Beautiful space, sep:  , split: [Beautiful space]
+}
+
+// 根据标志符分隔字符串，返回分隔后包含标志符的字符串数组
+func TestSplitAfter(t *testing.T) {
+	a := "Beautiful"
+	sep := "t"
+	split := strings.Split(a, sep)
+	after := strings.SplitAfter(a, sep)
+
+	fmt.Printf("all: %v, sep: %v, split: %v, split after: %v\n", a, sep, split, after)
+
+	//	output:
+	//	all: Beautiful, sep: t, split: [Beau iful], split after: [Beaut iful]
+}
 
 //	func TestC(t *testing.T) {
 //		strings
@@ -292,10 +336,153 @@ func TestC(t *testing.T) {
 //		strings
 //	}
 
-//	func TestC(t *testing.T) {
-//		strings
-//	}
+// 将字符串转为小写字符串
+func TestToLower(t *testing.T) {
+	a := "Beautiful"
+	lower := strings.ToLower(a)
+	fmt.Printf("origin: %v, lower: %v\n", a, lower)
 
-//	func TestC(t *testing.T) {
-//		strings
-//	}
+	//	output:
+	//	origin: Beautiful, lower: beautiful
+}
+
+// 返回指定unicode类型的小写格式
+func TestToLowerSpecial(t *testing.T) {
+	a := "асГДГССШШсцсшешшс"
+	special := strings.ToLowerSpecial(unicode.TurkishCase, a)
+	fmt.Printf("origin: %v, lower: %v\n", a, special)
+
+	//	оutput:
+	//	origin: асГДГССШШсцсшешшс, lower: асгдгссшшсцсшешшс
+}
+
+// 返回字符串的大写格式
+func TestToTitle(t *testing.T) {
+	a := "Beautiful"
+	title := strings.ToTitle(a)
+	fmt.Printf("title: %v\n", title)
+
+	//	output:
+	//	title: BEAUTIFUL
+}
+
+// 返回指定unicode类型的大写格式
+func TestTitleSpecial(t *testing.T) {
+	a := "асдфагаеср"
+	special := strings.ToTitleSpecial(unicode.TurkishCase, a)
+	fmt.Printf("special: %v", special)
+
+	//	output:
+	//	title: АСДФАГАЕСР
+}
+
+// 返回字符串的大写格式
+func TestToUpper(t *testing.T) {
+	a := "Beautiful"
+	upper := strings.ToUpper(a)
+	fmt.Printf("origin: %v, upper: %v\n", a, upper)
+
+	//	output:
+	//	origin: Beautiful, upper: BEAUTIFUL
+}
+
+// 返回指定unicode类型的大写格式
+func TestToUpperSpecial(*testing.T) {
+	a := "асдфагаеср"
+	upper := strings.ToUpperSpecial(unicode.TurkishCase, a)
+	fmt.Printf("origin: %v, upper: %v\n", a, upper)
+
+	//	output:
+	//	origin: асдфагаеср, upper: АСДФАГАЕСР
+}
+
+// 返回字符串删除前缀和后缀中的指定字符后的字符串
+func TestTrim(t *testing.T) {
+	a := "+-+Beautiful-+-"
+	trim := strings.Trim(a, "+-")
+	fmt.Printf("origin: %v, trim: %v\n", a, trim)
+
+	//	output:
+	//	origin: +-+Beautiful-+-, trim: Beautiful
+}
+
+func TestTrimFunc(t *testing.T) {
+	//strings.TrimFunc()
+}
+
+// cut掉字符串左边所有匹配到的指定字符，保留右边的字符串
+func TestTrimLeft(t *testing.T) {
+	a := "+-+Beautiful-+-"
+	b := "+-"
+	left := strings.TrimLeft(a, b)
+	fmt.Printf("origin: %v, trim: %v, left: %v\n", a, b, left)
+
+	//	output:
+	// 	origin: +-+Beautiful-+-, trim: +-, left: Beautiful-+-
+}
+
+// 自定义cut条件，cut掉字符串左侧字符，返回右侧保留字符
+func TestTrimLeftFunc(t *testing.T) {
+	a := "+-+Beautiful-+-"
+	left := strings.TrimLeftFunc(a, func(r rune) bool {
+		return !unicode.IsNumber(r) && !unicode.IsLetter(r)
+	})
+
+	fmt.Printf("origin: %v, left: %v\n", a, left)
+}
+
+// cut掉字符串指定的前缀字符串，返回cut后的字符串
+func TestPrefix(t *testing.T) {
+	a := "+-Beautiful-+-"
+	b := "+-"
+	prefix := strings.TrimPrefix(a, b)
+	fmt.Printf("origin: %v, trim: %v, prefix: %v\n", a, b, prefix)
+
+	//	output:
+	//	origin: +-Beautiful-+-, trim: +-, prefix: Beautiful-+-
+}
+
+// cut掉字符串右边所有匹配到的指定字符，保留左边的字符串
+func TestRight(t *testing.T) {
+	a := "+-+Beautiful-+-"
+	b := "+-"
+	right := strings.TrimRight(a, b)
+
+	fmt.Printf("origin: %v, trim: %v, right: %v\n", a, b, right)
+
+	//	output:
+	//	origin: +-+Beautiful-+-, trim: +-, right: +-+Beautiful
+}
+
+// 自定义cut条件，cut掉字符串右侧匹配到的字符串，返回左侧的字符串
+func TestTrimRightFunc(t *testing.T) {
+	a := "+-+Beautiful-+-"
+	right := strings.TrimRightFunc(a, func(r rune) bool {
+		return !unicode.IsNumber(r) && !unicode.IsLetter(r)
+	})
+	fmt.Printf("origin: %v, right: %v", a, right)
+
+	//	output:
+	//	origin: +-+Beautiful-+-, right: +-+Beautiful
+}
+
+// cut掉字符串两边的空格，返回trim后的字符串
+func TestTrimSpace(t *testing.T) {
+	a := "    Beautiful    "
+	trim := strings.TrimSpace(a)
+	fmt.Printf("origin: [%v], trim: [%v]\n", a, trim)
+
+	//	output:
+	//	origin: [    Beautiful    ], trim: [Beautiful]
+}
+
+// cut掉指定的后缀字符串，保留剩余前缀字符串
+func TestTrimSuffix(t *testing.T) {
+	a := "+-+Beautiful-+-"
+	b := "ful-+-"
+	suffix := strings.TrimSuffix(a, b)
+	fmt.Printf("origin: %v, trim: %v, suffix: %v\n", a, b, suffix)
+
+	//	output:
+	//	origin: +-+Beautiful-+-, trim: ful-+-, suffix: +-+Beauti
+}
