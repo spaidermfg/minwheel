@@ -234,37 +234,40 @@ func TestLastIndex(t *testing.T) {
 	//	all: Beautiful, son: u, first index: 3, last index: 7
 }
 
-//func TestC(t *testing.T) {
-//	strings.
-//}
+// 返回子字符串出现在父字符串中最靠后位置的下标，不存在则返回-1
+func TestLastIndexAny(t *testing.T) {
+	a := "Beautiful"
+	b := "redubsglsa"
+	indexAny := strings.LastIndexAny(a, b)
+	fmt.Printf("all: %v, son: %v, last index: %v\n", a, b, indexAny)
 
-//	func TestC(t *testing.T) {
-//		strings
-//	}
+	//	output:
+	//	all: Beautiful, son: redubsglsa, first index: -1, last index: 8
+}
 
-//	func TestC(t *testing.T) {
-//		strings
-//	}
+func TestLastIndexByte(t *testing.T) {
+	//strings.LastIndexByte()
+}
 
-//	func TestC(t *testing.T) {
-//		strings
-//	}
+func TestLastIndexFunc(t *testing.T) {
+	//strings.LastIndexFunc()
+}
 
-//func TestMap(t *testing.T) {
-//	a := "Beautiful"
-//	s := strings.Map(func(r rune) rune {
-//
-//	}, a)
-//	fmt.Printf("s: %v\n", s)
-//}
+func TestMap(t *testing.T) {
+	//a := "Beautiful"
+	//s := strings.Map(func(r rune) rune {
+	//
+	//}, a)
+	//fmt.Printf("s: %v\n", s)
+}
 
-//	func TestC(t *testing.T) {
-//		strings
-//	}
+func TestNewReader(t *testing.T) {
+	//strings.NewReader()
+}
 
-//	func TestC(t *testing.T) {
-//		strings
-//	}
+func TestNewReplacer(t *testing.T) {
+	//strings.NewReplacer()
+}
 
 // 返回字符串s重复n次的字符串
 func TestRepeat(t *testing.T) {
@@ -328,13 +331,21 @@ func TestSplitAfter(t *testing.T) {
 	//	all: Beautiful, sep: t, split: [Beau iful], split after: [Beaut iful]
 }
 
-//	func TestC(t *testing.T) {
-//		strings
-//	}
+func TestSplitAfterN(t *testing.T) {
+	//strings.SplitAfterN()
+}
 
-//	func TestC(t *testing.T) {
-//		strings
-//	}
+// 将字符串根据指定的字符标志分割成n份
+func TestSplitN(t *testing.T) {
+	a := "this is a new shoes"
+	sep := " "
+	n := 3
+	sn := strings.SplitN(a, sep, n)
+	fmt.Printf("all: %v, sep: %v, n: %v, split: %q\n", a, sep, n, sn)
+
+	//	output:
+	//	all: this is a new shoes, sep:  , n: 3, split: ["this" "is" "a new shoes"]
+}
 
 // 将字符串转为小写字符串
 func TestToLower(t *testing.T) {
@@ -352,7 +363,7 @@ func TestToLowerSpecial(t *testing.T) {
 	special := strings.ToLowerSpecial(unicode.TurkishCase, a)
 	fmt.Printf("origin: %v, lower: %v\n", a, special)
 
-	//	оutput:
+	//	output:
 	//	origin: асГДГССШШсцсшешшс, lower: асгдгссшшсцсшешшс
 }
 
@@ -406,8 +417,16 @@ func TestTrim(t *testing.T) {
 	//	origin: +-+Beautiful-+-, trim: Beautiful
 }
 
+// 自定义cut条件，cut掉字符串两侧字符，返回cut后的字符
 func TestTrimFunc(t *testing.T) {
-	//strings.TrimFunc()
+	a := "+-+Beautiful-+-"
+	trim := strings.TrimFunc(a, func(r rune) bool {
+		return !unicode.IsNumber(r) && !unicode.IsLetter(r)
+	})
+	fmt.Printf("origin: %v, trim: %v\n", a, trim)
+
+	//	output:
+	//	origin: +-+Beautiful-+-, trim: Beautiful
 }
 
 // cut掉字符串左边所有匹配到的指定字符，保留右边的字符串
