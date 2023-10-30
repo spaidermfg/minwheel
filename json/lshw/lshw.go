@@ -65,7 +65,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	fmt.Println("请输入 -h 获取帮助")
+	fmt.Println("请输入-h选项获取帮助")
 }
 
 // 获取排序好的网口信息
@@ -163,19 +163,14 @@ func (r *Rules) exist5G() bool {
 
 // 解析lshw命令输出
 func (r *Rules) analysisStdout() []*Network {
-	cmd := exec.Command("bash", "-c", "lshw -json -C network")
-	pipe, err := cmd.StdoutPipe()
+	cmd := exec.Command("lshw", "-json", "-C", "network")
+	output, err := cmd.Output()
 	if err != nil {
 		log.Fatal("lshw -json -C network命令执行失败:", err)
 	}
 
-	var s []byte
-	if _, err = pipe.Read(s); err != nil {
-		log.Fatal("lshw -json -C network命令执行失败:", err)
-	}
-
 	var network []*Network
-	if err = json.Unmarshal(s, &network); err != nil {
+	if err = json.Unmarshal(output, &network); err != nil {
 		log.Fatal("文件内容有误:", err)
 	}
 
