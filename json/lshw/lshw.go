@@ -35,10 +35,10 @@ var reload = flag.Bool("reload", false, "保存udev网口配置规则\nsudo udev
 
 func main() {
 	flag.Parse()
-	r := new(Rules)
-	network := r.analysisStdout()
 
 	if *show {
+		r := new(Rules)
+		network := r.analysisStdout()
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"网口名称", "mac地址"})
 		r.getNetInfo(network)
@@ -50,6 +50,8 @@ func main() {
 	}
 
 	if *write {
+		r := new(Rules)
+		network := r.analysisStdout()
 		r.getNetInfo(network)
 		r.writeRulesFile()
 		os.Exit(0)
