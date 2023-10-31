@@ -60,11 +60,10 @@ func main() {
 
 	if *reload {
 		cmd := exec.CommandContext(context.Background(), "udevadm", "control", "--reload-rules")
-		output, err1 := cmd.Output()
-		if err1 != nil {
+		if _, err1 := cmd.Output(); err1 != nil {
 			log.Fatal("sudo udevadm control --reload-rules执行失败:", err1)
 		}
-		fmt.Println("保存成功", output)
+		fmt.Println("保存成功")
 		os.Exit(0)
 	}
 
