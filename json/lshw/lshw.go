@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -138,6 +139,7 @@ func (r *Rules) writeRulesFile() {
 	if err != nil {
 		log.Fatal("创建文件有误:", err)
 	}
+
 	l := strings.Builder{}
 	for _, v := range r.Data {
 		l.WriteString(fmt.Sprintf("SUBSYSTEM==\"net\", ACTION==\"add\", DRIVERS==\"?*\", ATTR{address}==\"%v\", NAME=\"%v\"\n", v.Attr, v.Name))
@@ -146,6 +148,13 @@ func (r *Rules) writeRulesFile() {
 	if _, err = file.WriteString(l.String()); err != nil {
 		log.Fatal("文件写入失败:", err)
 	}
+
+	abs, err := filepath.Abs(file.Name())
+	if err != nil {
+		log.Fatal("文件路径获取失败:", err)
+	}
+
+	fmt.Println("生成网口规则临时文件成功 | Path:", abs)
 }
 
 // 查看是否存在有方的5G芯片
