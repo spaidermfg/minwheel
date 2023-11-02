@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"compress/gzip"
 	"encoding/binary"
 	"encoding/gob"
 	"errors"
@@ -35,6 +36,10 @@ func main() {
 	catchWrite()
 
 	catchRead()
+
+	zipData()
+
+	unzipData()
 }
 
 func findBadLine() {
@@ -453,6 +458,7 @@ func useGob() {
 }
 
 // 使用带缓冲I/O模式
+// 使用缓冲区写入
 func catchWrite() {
 	file := "./bufio.txt"
 	f, err := os.OpenFile(file, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
@@ -482,6 +488,7 @@ func catchWrite() {
 	bio.Flush()
 }
 
+// 使用缓冲区读取
 func catchRead() {
 	file := "./bufio.txt"
 	f, err := os.Open(file)
@@ -510,5 +517,59 @@ func catchRead() {
 		fmt.Printf("第%d次读取数据：%q,长度为%v\n\n", i, data, n)
 		fmt.Printf("当前缓冲区缓存数据量为%d\n", bio.Buffered())
 		i++
+	}
+}
+
+// 使用包裹类型实现数据压缩
+func zipData() {
+	file := "./hellos.gz"
+	f, err := os.OpenFile(file, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer f.Close()
+
+	zw := gzip.NewWriter(f)
+	defer zw.Close()
+
+	_, err = zw.Write([]byte("hello, gopher! I love golang!!!"))
+	if err != nil {
+		log.Fatal("write compressed data error:", err)
+	}
+
+	fmt.Println("write compressed data ok")
+}
+
+// 使用包裹类型实现数解压
+func unzipData() {
+	file := "./hellos.gz"
+	f, err := os.Open(file)
+	if err != nil {
+		log.Fatal("open file error:", err)
+	}
+	defer f.Close()
+
+	gzf, err := gzip.NewReader(f)
+	if err != nil {
+		log.Fatal("reader file error:", err)
+	}
+	defer gzf.Close()
+
+	i := 1
+	for {
+		data := make([]byte, 32)
+		_, err = gzf.Read(data)
+		if err == io.EOF {
+			fmt.Printf("第%v次读取到压缩数据：%q\n", i, data)
+			fmt.Println("read EOF,exit", err)
+			break
+		}
+
+		if err != nil {
+			log.Fatal("read data error:", err)
+		}
+
+		fmt.Printf("第%v次读取到压缩数据：%q\n", i, data)
 	}
 }
