@@ -1,4 +1,0 @@
-tom man 22
-mark women 23
-dylan man 24
-frank women 25

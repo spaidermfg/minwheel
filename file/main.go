@@ -31,6 +31,10 @@ func main() {
 	//useDirect()
 
 	useAbstractWrite()
+
+	catchWrite()
+
+	catchRead()
 }
 
 func findBadLine() {
@@ -437,7 +441,7 @@ func useGob() {
 		err = dec.Decode(&portrait)
 		if err == io.EOF {
 			fmt.Println("read meet EOF")
-			os.Exit(0)
+			break
 		}
 
 		if err != nil {
@@ -445,5 +449,66 @@ func useGob() {
 		}
 
 		fmt.Println(portrait)
+	}
+}
+
+// 使用带缓冲I/O模式
+func catchWrite() {
+	file := "./bufio.txt"
+	f, err := os.OpenFile(file, os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	defer func() {
+		f.Sync()
+		f.Close()
+	}()
+
+	data := []byte("I love golang!\n")
+
+	// 创建带缓冲的类型
+	bio := bufio.NewWriterSize(f, 32)
+
+	// 写入15字节，存入缓存区
+	bio.Write(data)
+
+	// 写入15字节，存入缓存区
+	bio.Write(data)
+
+	// 写入15字节，向文件中写入32字节，存入 （3 * 15）- 32字节
+	bio.Write(data)
+
+	bio.Flush()
+}
+
+func catchRead() {
+	file := "./bufio.txt"
+	f, err := os.Open(file)
+	if err != nil {
+		log.Fatal("open file error:", err)
+	}
+
+	// 通过包裹函数创建带缓冲I/O的类型
+	// 初始缓冲区大小危64字节
+	bio := bufio.NewReaderSize(f, 64)
+	fmt.Printf("初始缓冲区缓冲数量：%v\n", bio.Buffered())
+
+	i := 1
+	for {
+		data := make([]byte, 15)
+		n, err1 := bio.Read(data)
+		if err1 == io.EOF {
+			fmt.Printf("第%v次读取数据，读取到文件末尾，程序退出\n", i)
+			break
+		}
+
+		if err1 != nil {
+			log.Fatal("read file error:", err1)
+		}
+
+		fmt.Printf("第%d次读取数据：%q,长度为%v\n\n", i, data, n)
+		fmt.Printf("当前缓冲区缓存数据量为%d\n", bio.Buffered())
+		i++
 	}
 }
