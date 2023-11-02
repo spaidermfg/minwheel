@@ -12,6 +12,12 @@ import (
 	"strings"
 )
 
+// 使用gob读取抽象数据类型
+// 读取抽象数据类型
+// 1. fmt.Fscan & fmt.Fprint
+// 2. binary.Read & binary.Write
+// 3. gob.Decode & gob.Encode
+
 func main() {
 	// a := "conf/auth.conf"
 	// pre, suf := path.Split(a)
@@ -418,5 +424,26 @@ func useGob() {
 	err := gobWriteToFile("./gob.txt", portraits)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	open, err := os.Open("./gob.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var portrait Portrait
+	dec := gob.NewDecoder(open)
+	for {
+		err = dec.Decode(&portrait)
+		if err == io.EOF {
+			fmt.Println("read meet EOF")
+			os.Exit(0)
+		}
+
+		if err != nil {
+			log.Fatal("read file error: ", err)
+		}
+
+		fmt.Println(portrait)
 	}
 }
