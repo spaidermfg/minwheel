@@ -159,16 +159,11 @@ func (r *Rules) writeRulesFile() {
 // 查看是否存在有方的5G芯片
 func (r *Rules) exist5G() bool {
 	cmd := exec.CommandContext(context.Background(), "bash", "-c", "lsusb | grep Neoway")
-	output, err := cmd.Output()
-	if err != nil {
-		log.Fatal("lsusb 命令执行失败:", err)
+	if err := cmd.Run(); err != nil {
+		return false
 	}
 
-	if string(output) != "" {
-		return true
-	}
-
-	return false
+	return true
 }
 
 // 解析lshw命令输出
