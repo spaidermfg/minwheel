@@ -5,13 +5,13 @@ import (
 	"reflect"
 )
 
-type Person struct {
+type Persons struct {
 	Name string
 	Age  int
 }
 
-func Use_person() {
-	bob := &Person{"Bob", 22}
+func Use_persons() {
+	bob := &Persons{"Bob", 22}
 	v := reflect.ValueOf(bob)
 
 	for i := 0; i < v.NumField(); i++ {
