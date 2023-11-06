@@ -98,6 +98,9 @@ func TestTypeEqual(t *testing.T) {
 }
 
 // 通过Type和Value对反射实例进行值信息和类型信息的检视
+// Name方法返回有确定定义的类型的名字，没有返回空
+// String方法返回的类型描述可能包含包名
+// Kind方法返回类型的特定类别
 func TestCheckTyp(t *testing.T) {
 	// bool
 	b := true
@@ -129,5 +132,72 @@ func TestCheckTyp(t *testing.T) {
 	}
 	funcTyp := reflect.TypeOf(add)
 	funcVal := reflect.ValueOf(add)
-	fmt.Println(funcTyp.Kind(), "|", funcTyp.String(), "|", funcVal.String())
+	fmt.Println(funcTyp.Kind(), "|", funcTyp.String(), "|", funcTyp.Name(), "|", funcVal.String())
+}
+
+// 对原生复合类型和自定义类型进行检视
+func TestCheckCompoundTyp(t *testing.T) {
+	// 复合类型
+	// slice
+	sl := []int{6, 7}
+	sliceVal := reflect.ValueOf(sl)
+	sliceTyp := reflect.TypeOf(sl)
+	fmt.Println(sliceTyp.Kind(), sliceTyp.Name(), sliceTyp.String())
+	fmt.Println(sliceVal.Kind(), sliceVal.String())
+	fmt.Println(sliceVal.Index(0).Int(), sliceVal.Index(1).Int())
+
+	// array
+	arr := [3]int{2, 6, 7}
+	arrayVal := reflect.ValueOf(arr)
+	arrayTyp := reflect.TypeOf(arr)
+	fmt.Println(arrayTyp.Kind(), arrayTyp.Name(), arrayTyp.String())
+	fmt.Println(arrayVal.Index(0).Int(), arrayVal.Index(1).Int(), arrayVal.Index(2).Int())
+
+	// map
+	m := map[string]int{
+		"a": 1,
+		"b": 2,
+		"c": 3,
+	}
+	mapVal := reflect.ValueOf(m)
+	mapTyp := reflect.TypeOf(m)
+
+	iter := mapVal.MapRange()
+	for iter.Next() {
+		k := iter.Key()
+		v := iter.Value()
+		fmt.Printf("[%s:%d]\n", k.String(), v.Int())
+	}
+	fmt.Println(mapTyp.Kind(), mapTyp.String())
+
+	// struct
+	type Person struct {
+		Name string
+		Age  int
+	}
+
+	p := Person{"mark", 22}
+	structVal := reflect.ValueOf(p)
+	structTyp := reflect.TypeOf(p)
+	fmt.Println(structTyp.Kind(), structTyp.Name(), structTyp.String())
+	fmt.Println(structVal.Field(0).String(), structVal.Field(1).Int())
+
+	// chan
+	ch := make(chan int, 1)
+	chanVal := reflect.ValueOf(ch)
+	chanTyp := reflect.TypeOf(ch)
+	ch <- 67
+	x, ok := chanVal.TryRecv()
+	if ok {
+		fmt.Println(x.Int())
+	}
+	fmt.Println(chanTyp.Kind(), chanTyp.Name(), chanTyp.String())
+
+	//自定义类型
+	type myInt int
+	var mi myInt = 67
+	myVal := reflect.ValueOf(mi)
+	myTyp := reflect.TypeOf(mi)
+	fmt.Println(myTyp.Kind(), myTyp.Name(), myTyp.String())
+	fmt.Println(myVal.Int())
 }
