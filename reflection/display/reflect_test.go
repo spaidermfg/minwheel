@@ -136,6 +136,9 @@ func TestCheckTyp(t *testing.T) {
 }
 
 // 对原生复合类型和自定义类型进行检视
+// 数组切片---Index()
+// map---MapRange(), MapIndex()
+// struct---Field()
 func TestCheckCompoundTyp(t *testing.T) {
 	// 复合类型
 	// slice
@@ -200,4 +203,32 @@ func TestCheckCompoundTyp(t *testing.T) {
 	myTyp := reflect.TypeOf(mi)
 	fmt.Println(myTyp.Kind(), myTyp.Name(), myTyp.String())
 	fmt.Println(myVal.Int())
+}
+
+func Add(i, j int) int {
+	return i * j
+}
+
+type Calculator struct{}
+
+func (c *Calculator) Add(i, j int) int {
+	return i * j
+}
+
+// 通过反射对象调用函数和方法
+func TestCallFunc(t *testing.T) {
+	// 调用函数
+	f := reflect.ValueOf(Add)
+	i := 6
+	j := 7
+
+	vals := []reflect.Value{reflect.ValueOf(i), reflect.ValueOf(j)}
+	call := f.Call(vals)
+	fmt.Println(call[0].Int())
+
+	// 调用方法
+	c := reflect.ValueOf(&Calculator{})
+	m := c.MethodByName("Add")
+	ret := m.Call(vals)
+	fmt.Println(ret[0].Int())
 }
