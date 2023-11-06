@@ -232,3 +232,20 @@ func TestCallFunc(t *testing.T) {
 	ret := m.Call(vals)
 	fmt.Println(ret[0].Int())
 }
+
+// 通过Interface方法将reflect.Value对象恢复成一个interface{}类型的变量值
+func TestInterfaceReflect(t *testing.T) {
+	// 得到的r是新的变量
+	var i = 5
+	val := reflect.ValueOf(i)
+	r := val.Interface().(int)
+	r = 6
+	fmt.Println(i, r)
+
+	// 得到的q与原指针变量相同
+	val = reflect.ValueOf(&i)
+	q := val.Interface().(*int)
+	*q = 7
+	fmt.Printf("%p, %p\n", &i, q)
+	fmt.Println(i, *q)
+}
