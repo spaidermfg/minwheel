@@ -337,9 +337,9 @@ func TestSplitAfterN(t *testing.T) {
 
 // 将字符串根据指定的字符标志分割成n份
 func TestSplitN(t *testing.T) {
-	a := "this is a new shoes"
+	a := "this  is a   new     shoes"
 	sep := " "
-	n := 3
+	n := 5
 	sn := strings.SplitN(a, sep, n)
 	fmt.Printf("all: %v, sep: %v, n: %v, split: %q\n", a, sep, n, sn)
 
