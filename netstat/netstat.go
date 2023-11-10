@@ -91,16 +91,18 @@ func (n *netstat) processName() {
 
 		res := strings.Split(string(info), "\n")
 		for _, v := range res {
-			part := strings.Split(strings.TrimSpace(v), ":")
-			if len(part) == 2 {
-				key := strings.TrimSpace(part[0])
-				value := strings.TrimSpace(part[1])
+			part := strings.SplitN(strings.TrimSpace(v), ":", 2)
+			if len(part) != 2 {
+				continue
+			}
 
-				if key == "Path" {
-					o.Path = value
-				} else if key == "ProcessName" {
-					o.Name = value
-				}
+			key := strings.TrimSpace(part[0])
+			value := strings.TrimSpace(part[1])
+			if key == "Path" {
+				o.Path = value
+			}
+			if key == "ProcessName" {
+				o.Name = value
 			}
 		}
 	}
