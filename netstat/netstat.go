@@ -3,9 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/olekukonko/tablewriter"
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
 )
 
@@ -36,15 +38,18 @@ func main() {
 			Output: nil,
 		}
 
-		fmt.Println("port", n.Tip)
 		n.search()
+		n.processName()
+		table := tablewriter.NewWriter(os.Stdout)
+		table.SetHeader([]string{"序号", "协议", "本地地址", "外部地址", "连接状态", "进程ID", "进程名", "进程路径"})
 
 		for i, o := range n.Output {
-			fmt.Println(i, o.Proto, o.LocalAddr, o.ForeignAddr, o.State, o.Pid)
+			table.Append([]string{strconv.Itoa(i), o.Proto, o.LocalAddr, o.ForeignAddr, o.State, o.Pid, o.Name, o.Path})
 		}
+		table.Render()
 		os.Exit(0)
 	}
-	fmt.Println("请输入需要检索的进程相关信息\n\r[Example]:\n\r   [根据端口号检索: ./pro 8200]\n\r   [根据进程名检索: ./pro rtnn]")
+	fmt.Println("请输入需要检索的进程相关信息\n\r[Example]:\n\r   [根据端口号检索: ./state.exe -tip 8200]\n\r   [根据进程名检索: ./state.exe -tip rtnn]")
 }
 
 func (n *netstat) search() {
@@ -62,29 +67,41 @@ func (n *netstat) search() {
 		}
 
 		fields := strings.Fields(line)
-		if len(fields) == 5 {
-			n.Output = append(n.Output, &output{
-				Proto:       fields[0],
-				LocalAddr:   fields[1],
-				ForeignAddr: fields[2],
-				State:       fields[3],
-				Pid:         fields[4],
-			})
+		if len(fields) != 5 {
+			continue
 		}
+
+		n.Output = append(n.Output, &output{
+			Proto:       fields[0],
+			LocalAddr:   fields[1],
+			ForeignAddr: fields[2],
+			State:       fields[3],
+			Pid:         fields[4],
+		})
 	}
 }
 
 func (n *netstat) processName() {
 	for _, o := range n.Output {
-		cmd := exec.Command("cmd", "/C", fmt.Sprintf("Get-Process -Id %v | Select-Object *", o.Pid))
-		//info, err := cmd.Output()
+		cmd := exec.Command("powershell", "Get-Process", "-Id", o.Pid, "|", "Select-Object", "*")
+		info, err := cmd.Output()
 		if err != nil {
 			log.Fatal(fmt.Sprintf("命令[%v]执行失败，Err: %v", cmd.String(), err))
 		}
 
-		//if err := json.Unmarshal(info); err != nil {
-		//	return
-		//}
+		res := strings.Split(string(info), "\n")
+		for _, v := range res {
+			part := strings.Split(strings.TrimSpace(v), ":")
+			if len(part) == 2 {
+				key := strings.TrimSpace(part[0])
+				value := strings.TrimSpace(part[1])
 
+				if key == "Path" {
+					o.Path = value
+				} else if key == "ProcessName" {
+					o.Name = value
+				}
+			}
+		}
 	}
 }
