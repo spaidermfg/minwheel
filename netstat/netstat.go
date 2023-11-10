@@ -7,9 +7,11 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 )
 
 var tip = flag.String("tip", "", "输入进程相关信息")
@@ -41,13 +43,17 @@ func main() {
 
 		n.search()
 		n.processName()
+		fmt.Println(">>> 输出信息开始渲染")
 		table := tablewriter.NewWriter(os.Stdout)
 		table.SetHeader([]string{"序号", "协议", "本地地址", "外部地址", "连接状态", "进程ID", "进程名", "进程路径"})
 
-		fmt.Println(">>> 输出信息开始渲染")
+		sort.Slice(n.Output, func(i, j int) bool {
+			return n.Output[i].Name < n.Output[j].Name
+		})
 		for i, o := range n.Output {
 			table.Append([]string{strconv.Itoa(i), o.Proto, o.LocalAddr, o.ForeignAddr, o.State, o.Pid, o.Name, o.Path})
 		}
+
 		fmt.Println(">>> 输出渲染完成")
 		table.Render()
 		os.Exit(0)
@@ -89,7 +95,14 @@ func (n *netstat) search() {
 func (n *netstat) processName() {
 	fmt.Println(">>> 通过PID开始查询进程信息")
 	var wg sync.WaitGroup
+	var i int
 	for _, v := range n.Output {
+		// 现场机器内存不够分配
+		if i == 8 {
+			i = 0
+			time.Sleep(5 * time.Second)
+		}
+
 		wg.Add(1)
 		go func(o *output) {
 			defer wg.Done()
@@ -116,6 +129,7 @@ func (n *netstat) processName() {
 				}
 			}
 		}(v)
+		i++
 	}
 
 	wg.Wait()
