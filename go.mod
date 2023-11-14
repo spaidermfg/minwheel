@@ -21,6 +21,7 @@ require (
 )
 
 require (
+	github.com/bytecodealliance/wasmtime-go v1.0.0 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
 	github.com/mattn/go-runewidth v0.0.15 // indirect
