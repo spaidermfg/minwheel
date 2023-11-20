@@ -83,14 +83,14 @@ func (r *Rules) getNetInfo(data []*Network) {
 		if v.Businfo == "" {
 			switch v.Physid {
 			case "1":
-				add("lan1", v.Serial)
+				add("lan2", v.Serial)
 			case "2":
 				if !r.exist5G() {
-					add("lan2", v.Serial)
+					add("lan1", v.Serial)
 				}
 			case "3":
 				if r.exist5G() {
-					add("lan2", v.Serial)
+					add("lan1", v.Serial)
 				}
 			}
 		} else {
