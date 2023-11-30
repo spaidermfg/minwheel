@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -19,7 +21,8 @@ func main() {
 	//s.notify()
 	//s.double()
 	//s.one()
-	s.total()
+	//s.total()
+	s.quit()
 }
 
 func (s *signaler) web() {
@@ -145,4 +148,58 @@ func (s *signaler) total() {
 			os.Exit(0)
 		}
 	}
+}
+
+func (s *signaler) quit() {
+	var wg sync.WaitGroup
+
+	http.HandleFunc("/hello", func(writer http.ResponseWriter, request *http.Request) {
+		fmt.Fprintf(writer, "Hello, Signal!\n")
+	})
+
+	srv := http.Server{Addr: "localhost:8080"}
+	srv.RegisterOnShutdown(func() {
+		fmt.Println("clean resources on shutdown...")
+		time.Sleep(time.Second * 2)
+		fmt.Println("clean resources ok")
+		wg.Done()
+	})
+
+	wg.Add(2)
+	go func() {
+		quit := make(chan os.Signal, 1)
+		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
+
+		<-quit
+		timeoutCtx, cf := context.WithTimeout(context.Background(), time.Second*5)
+		defer cf()
+		done := make(chan struct{}, 1)
+
+		go func() {
+			if err := srv.Shutdown(timeoutCtx); err != nil {
+				fmt.Println("web server shutdown error: ", err)
+			} else {
+				fmt.Println("web server shutdown ok")
+			}
+
+			done <- struct{}{}
+			wg.Done()
+		}()
+
+		select {
+		case <-timeoutCtx.Done():
+			fmt.Println("web server shutdown timeout")
+		case <-done:
+			fmt.Println("web server shutdown is done")
+		}
+	}()
+
+	if err := srv.ListenAndServe(); err != nil {
+		if !errors.Is(err, http.ErrServerClosed) {
+			fmt.Println("web server start failed: ", err)
+			return
+		}
+	}
+	wg.Wait()
+	fmt.Println("program exit ok")
 }
