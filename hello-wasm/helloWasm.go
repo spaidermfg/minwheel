@@ -30,6 +30,7 @@ func main() {
 	fmt.Println("result: ", val.(int32))
 
 	useWasmer()
+	useWasm()
 }
 
 func useWasmer() {
@@ -62,4 +63,30 @@ func useWasmer() {
 	}
 
 	fmt.Println("Result of sum:", result)
+}
+
+func useWasm() {
+	wasmBytes, err := os.ReadFile("sum.wasm")
+	if err != nil {
+		log.Fatal(err)
+	}
+	store := wasmtime.NewStore(wasmtime.NewEngine())
+	module, err := wasmtime.NewModule(store.Engine, wasmBytes)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	instance, err := wasmtime.NewInstance(store, module, []wasmtime.AsExtern{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	sum := instance.GetExport(store, "sum").Func()
+
+	call, err := sum.Call(store, 8, 9)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Result of wasmtime:", call)
 }
