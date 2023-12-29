@@ -1,5 +1,12 @@
 package main
 
+import (
+	"fmt"
+	"io/fs"
+	"os"
+	"path/filepath"
+)
+
 /*
 *******************************************************
 Author: min
@@ -20,8 +27,45 @@ Name: 文件目录正确性校验程序
 		查找缺失目录
 		扫描结果展示
 
+
+json
+
 ********************************************************
 */
-func main() {
 
+const (
+	WorkSpace = ".filetwins"
+	FilePath  = ""
+)
+
+type Target struct {
+	FileNum  int               // 文件数
+	DirNum   int               // 目录总数
+	NullFile map[string]string // 空文件
+	NewFile  map[string]string // 新文件
+}
+
+func main() {
+	roll()
+}
+
+func roll() {
+	filepath.Walk(FilePath, func(path string, info fs.FileInfo, err error) error {
+
+		return nil
+	})
+	filepath.WalkDir(FilePath, func(path string, d fs.DirEntry, err error) error {
+
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+
+}
+
+func (t *Target) save() {
+	if err := os.MkdirAll(WorkSpace, 0777); err != nil {
+		fmt.Println(err)
+	}
 }
