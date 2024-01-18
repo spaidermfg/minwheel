@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"golang.org/x/net/html"
+	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -11,6 +12,8 @@ import (
 // 递归：函数直接或间接的调用自身
 
 func main() {
+	log.SetFlags(0)
+	log.SetPrefix(">>>>>> ")
 	s := `<p>Links:</p><ul><li><a href="foo">Foo</a><li><a href="/bar/baz">BarBaz</a></ul>`
 	parse, err := html.Parse(strings.NewReader(s))
 	if err != nil {
@@ -33,7 +36,7 @@ func main() {
 		}
 
 		for _, link := range links {
-			fmt.Println(link)
+			log.Println(link)
 		}
 	}
 }
@@ -83,3 +86,10 @@ func findLinks(url string) ([]string, error) {
 
 	return visit(nil, parse), nil
 }
+
+//func waitForServer(url string) error {
+//	deadline := time.Now().Add(time.Minute * 1)
+//	for tries := 0; time.Now().Before(deadline); tries++ {
+//
+//	}
+//}
