@@ -73,7 +73,7 @@ func main() {
 	//	}
 	//}
 
-	fmt.Println(time.Now().Format(strconv.Itoa(2006102150405)))
+	fmt.Println(time.Now().Format(strconv.Itoa(2006121545)))
 	d := new(datetime)
 	d.getTimeNow()
 
