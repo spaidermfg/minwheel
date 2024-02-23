@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -72,6 +73,7 @@ func main() {
 	//	}
 	//}
 
+	fmt.Println(time.Now().Format(strconv.Itoa(2006102150405)))
 	d := new(datetime)
 	d.getTimeNow()
 
