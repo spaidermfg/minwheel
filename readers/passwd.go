@@ -6,7 +6,9 @@ import (
 	"fmt"
 	"github.com/dlclark/regexp2"
 	"log"
+	"math/bits"
 	"os"
+	"regexp"
 	"strings"
 	"unicode"
 )
@@ -26,7 +28,14 @@ func main() {
 		//	break
 		//}
 		//
-		if err = isPwd(strings.TrimSpace(readString)); err == nil {
+
+		//if err = isPwd(strings.TrimSpace(readString)); err == nil {
+		//	fmt.Print("密码正确!")
+		//	break
+		//}
+		//log.Println(err)
+
+		if err = isRightPwd(strings.TrimSpace(readString)); err == nil {
 			fmt.Print("密码正确!")
 			break
 		}
@@ -86,4 +95,34 @@ func isValidPassword(password string) bool {
 	}
 
 	return matchString
+}
+
+func isRightPwd(pwd string) error {
+	if len(pwd) < 8 {
+		return errors.New("密码长度小于八位")
+	}
+
+	var bit uint8
+	if regexp.MustCompile(`\d`).MatchString(pwd) {
+		bit |= 1 << 0
+	}
+
+	if regexp.MustCompile(`[a-z]`).MatchString(pwd) {
+		bit |= 1 << 1
+	}
+
+	if regexp.MustCompile(`[A-Z]`).MatchString(pwd) {
+		bit |= 1 << 2
+	}
+
+	if regexp.MustCompile(`[\p{P}\p{S}]`).MatchString(pwd) {
+		bit |= 1 << 3
+	}
+
+	fmt.Println("bit:", bit, "bitsOne:", bits.OnesCount8(bit))
+
+	if bits.OnesCount8(bit) < 3 {
+		return errors.New("密码至少包含三种")
+	}
+	return nil
 }
