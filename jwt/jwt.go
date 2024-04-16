@@ -20,11 +20,11 @@ func main() {
 
 	log.Println("----------------------------------------")
 	user := &UserPayload{
-		Name:    "mark",
-		Age:     17,
-		Email:   "hello@world",
-		ExpTime: time.Hour,
-		Nowtime: time.Now(),
+		Name:      "mark",
+		Age:       17,
+		Email:     "hello@world",
+		ExpTime:   time.Hour,
+		StartTime: time.Now(),
 	}
 
 	// 签名
@@ -86,11 +86,11 @@ type JWT struct {
 }
 
 type UserPayload struct {
-	Name    string
-	Age     int8
-	Email   string
-	Nowtime time.Time
-	ExpTime time.Duration
+	Name      string
+	Age       int8
+	Email     string
+	StartTime time.Time
+	ExpTime   time.Duration
 }
 
 // base64编码
@@ -166,8 +166,8 @@ func parseToken(token string) (*JWT, error) {
 	}
 
 	// 有效期校验
-	log.Println(user.ExpTime, user.Nowtime)
-	expTime := user.Nowtime.Add(user.ExpTime)
+	log.Println(user.ExpTime, user.StartTime)
+	expTime := user.StartTime.Add(user.ExpTime)
 	if time.Now().After(expTime) {
 		return nil, errors.New("token过期，已失效")
 	} else {
