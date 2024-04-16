@@ -135,6 +135,7 @@ func createToken(payloadData any) (string, error) {
 	return strings.Join([]string{headerAndPayload, signature}, "."), err
 }
 
+// 解析token
 func parseToken(token string) (*JWT, error) {
 	split := strings.Split(token, ".")
 	if len(split) != 3 {
