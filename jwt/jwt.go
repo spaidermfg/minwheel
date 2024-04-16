@@ -23,7 +23,8 @@ func main() {
 		Name:    "mark",
 		Age:     17,
 		Email:   "hello@world",
-		ExpTime: time.H,
+		ExpTime: time.Hour,
+		Nowtime: time.Now(),
 	}
 
 	// 签名
@@ -39,8 +40,6 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Println(j)
-
-	isTimeExpired(time.Second * 10)
 }
 
 func create() string {
@@ -82,7 +81,7 @@ func parse(token string) {
 
 type JWT struct {
 	header    string
-	payload   string
+	payload   UserPayload
 	signature string
 }
 
@@ -90,6 +89,7 @@ type UserPayload struct {
 	Name    string
 	Age     int8
 	Email   string
+	Nowtime time.Time
 	ExpTime time.Duration
 }
 
@@ -150,6 +150,7 @@ func parseToken(token string) (*JWT, error) {
 		return nil, errors.New("签名生成错误" + err.Error())
 	}
 
+	// 签名校验
 	if signature != s {
 		return nil, errors.New("token校验失败")
 	}
@@ -159,25 +160,25 @@ func parseToken(token string) (*JWT, error) {
 		return nil, errors.New("payload解码失败" + err.Error())
 	}
 
+	user := new(UserPayload)
+	if err = json.Unmarshal(decodePayload, user); err != nil {
+		return nil, errors.New("user反序列化失败" + err.Error())
+	}
+
+	// 有效期校验
+	log.Println(user.ExpTime, user.Nowtime)
+	expTime := user.Nowtime.Add(user.ExpTime)
+	if time.Now().After(expTime) {
+		return nil, errors.New("token过期，已失效")
+	} else {
+		log.Println("token有效")
+	}
+
 	jwt := &JWT{
 		header:    header,
-		payload:   string(decodePayload),
+		payload:   *user,
 		signature: signature,
 	}
 
 	return jwt, err
-}
-
-// 时间有效期判断
-func isTimeExpired(duration time.Duration) {
-	expiryTime := time.Now().Add(duration)
-
-	time.Sleep(time.Second * 12)
-
-	after := time.Now().After(expiryTime)
-	if after {
-		log.Println("token失效")
-	} else {
-		log.Println("token有效")
-	}
 }
