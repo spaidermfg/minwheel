@@ -8,6 +8,7 @@ import (
 	"errors"
 	"github.com/golang-jwt/jwt/v5"
 	"log"
+	"net/http"
 	"strings"
 	"time"
 )
@@ -44,7 +45,11 @@ func main() {
 
 func create() string {
 	token := jwt.New(jwt.SigningMethodHS256)
-
+	
+	//jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+	//	"iat": "",
+	//	"exp": "",
+	//})
 	claims := token.Claims.(jwt.MapClaims)
 	claims["id"] = "issuer"
 	claims["iat"] = time.Now().Unix()                       // 当前时间的Unix时间戳
@@ -59,6 +64,7 @@ func create() string {
 	}
 
 	log.Println("token:", signedString)
+
 	return signedString
 }
 
@@ -182,4 +188,29 @@ func parseToken(token string) (*JWT, error) {
 	}
 
 	return jwt, err
+}
+
+// MiddlewareFunc ---------------------------------
+type MiddlewareFunc func(header http.Handler) http.Handler
+
+func ApplyMiddleware(handler http.Handler, middlewares ...MiddlewareFunc) http.Handler {
+	for _, middleware := range middlewares {
+		handler = middleware(handler)
+	}
+	return handler
+}
+
+func AuthMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		next.ServeHTTP(w, r)
+	})
+}
+
+func login() {
+	apiHandler := http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
+		log.Println("Welcome to space!")
+	})
+	middlewareHandler := ApplyMiddleware(apiHandler, AuthMiddleware)
+
+	http.ListenAndServe(":9000", middlewareHandler)
 }
