@@ -85,7 +85,6 @@ type PageData struct {
 
 // 处理主页请求
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	// 默认展示空页面
 	data := PageData{}
 
 	// 如果有表单提交
