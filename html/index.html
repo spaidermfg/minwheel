@@ -2,38 +2,80 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Base64 Encoder/Decoder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Service</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        #buttonContainer {
+            display: flex;
+            justify-content: space-around;
+            background-color: #f0f0f0;
+            padding: 10px 0;
+        }
+        .button {
+            width: 200px;
+            height: 50px;
+            text-align: center;
+            line-height: 50px;
+            cursor: pointer;
+            background-color: #ccc;
+            border: 1px solid #999;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background-color: #999;
+        }
+        .active {
+            background-color: #007bff;
+            color: #fff;
+        }
+    </style>
 </head>
 <body>
-    <div id="container">
-        <div id="header" style="background-color:#FFA500;height: 10%">
-            <h1 style="margin-bottom:0;">主要的网页标题</h1>
-        </div>
+<div id="buttonContainer">
+    <div id="base64Button" class="button">Base64</div>
+    <div id="jsonButton" class="button">JSON</div>
+</div>
 
-        <div id="menu" style="background-color:#FFD700;height:85%;width:15%;float:left;">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#news">News</a></li>
-            <li><a href="#contact">Contact</a></li>
-            <li><a href="#about">About</a></li>
-        </div>
+<div id="base64Page" style="display: none;">
+    <!-- Base64 加解密页面内容 -->
+    <!-- 这里可以放你的 Base64 加解密页面内容 -->
+    <h1>base64</h1>
+</div>
 
-        <div id="content" style="background-color:#EEEEEE;height:85%;width:85%;float:left;">
-            <form method="post">
-            <textarea name="input" placeholder="Enter text to encode or decode"></textarea><br>
-            <input type="radio" name="action" value="encode" {{ if .IsEncode }}checked{{ end }}> Encode
-            <input type="radio" name="action" value="decode" {{ if not .IsEncode }}checked{{ end }}> Decode
-            <select name="method">
-                <option value="Encode">Encode</option>
-                <option value="Decode">Decode</option>
-            </select>
-            <button type="submit">Submit</button>
-            </form>
-            <textarea readonly>{{ .Output }}</textarea>
-        </div>
+<div id="jsonPage" style="display: none;">
+    <!-- JSON 格式化页面内容 -->
+    <!-- 这里可以放你的 JSON 格式化页面内容 -->
+    <h1>json page</h1>
+</div>
 
-        <div id="footer" style="background-color:#FFA500;clear:both;text-align:center;">
-            版权 © runoob.com
-        </div>
-    </div>
+<script>
+    // 获取按钮元素
+    var base64Button = document.getElementById("base64Button");
+    var jsonButton = document.getElementById("jsonButton");
+    // 获取页面元素
+    var base64Page = document.getElementById("base64Page");
+    var jsonPage = document.getElementById("jsonPage");
+
+    // 点击 Base64 按钮时，显示 Base64 页面，隐藏 JSON 页面，并高亮 Base64 按钮
+    base64Button.addEventListener("click", function() {
+        base64Page.style.display = "block";
+        jsonPage.style.display = "none";
+        base64Button.classList.add("active");
+        jsonButton.classList.remove("active");
+    });
+
+    // 点击 JSON 按钮时，显示 JSON 页面，隐藏 Base64 页面，并高亮 JSON 按钮
+    jsonButton.addEventListener("click", function() {
+        base64Page.style.display = "none";
+        jsonPage.style.display = "block";
+        base64Button.classList.remove("active");
+        jsonButton.classList.add("active");
+    });
+</script>
 </body>
 </html>

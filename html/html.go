@@ -32,15 +32,21 @@ func (b *Base64Web) web() {
 	http.HandleFunc("/", handlerFunc)
 	http.HandleFunc("/hello", indexHandler)
 	http.HandleFunc("/demo", handlerDemo)
+	http.HandleFunc("/index", handlerSelect)
 	fmt.Println("========================> Running")
 	http.ListenAndServe(":8080", nil)
 
 }
 
+func handlerSelect(w http.ResponseWriter, r *http.Request) {
+	must := template.Must(template.ParseFiles("html/index.html"))
+	must.Execute(w, nil)
+}
+
 func handlerFunc(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("is-control", "yes")
-	files, _ := template.New("").ParseFiles("html/text.html")
-	files.Execute(w, nil)
+	must := template.Must(template.ParseFiles("html/text.html"))
+	must.Execute(w, nil)
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -117,6 +123,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 渲染 HTML 模板并返回给客户端
-	tmpl := template.Must(template.ParseFiles("html/index.html"))
+	tmpl := template.Must(template.ParseFiles("html/index1.html"))
 	tmpl.Execute(w, data)
 }
