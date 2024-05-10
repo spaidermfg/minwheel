@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 )
@@ -33,9 +34,18 @@ func (b *Base64Web) web() {
 	http.HandleFunc("/hello", indexHandler)
 	http.HandleFunc("/demo", handlerDemo)
 	http.HandleFunc("/index", handlerSelect)
+	http.HandleFunc("/encode", encode)
 	fmt.Println("========================> Running")
 	http.ListenAndServe(":8080", nil)
 
+}
+
+func encode(w http.ResponseWriter, r *http.Request) {
+	data, err := io.ReadAll(r.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("=============", string(data))
 }
 
 func handlerSelect(w http.ResponseWriter, r *http.Request) {

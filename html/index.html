@@ -29,10 +29,25 @@
         .button:hover {
             background-color: #999;
         }
-        .active {
-            background-color: #007bff;
-            color: #fff;
+
+        /* 输入框和下拉框样式 */
+        input[type="text"], select {
+            width: 200px;
+            height: 30px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
         }
+
+        /* 居中展示 */
+        .centered {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
     </style>
 </head>
 <body>
@@ -41,17 +56,34 @@
     <div id="jsonButton" class="button">JSON</div>
 </div>
 
-<div id="base64Page" style="display: none;">
-    <!-- Base64 加解密页面内容 -->
-    <!-- 这里可以放你的 Base64 加解密页面内容 -->
-    <h1>base64</h1>
+<div id="base64Page" style="display: none;" class="centered">
+    <h2>Base64 编码</h2>
+    <form id="base64Form">
+        <label for="serviceCount">服务数量：</label>
+        <input type="text" id="serviceCount" name="serviceCount"><br><br>
+
+        <label for="pointCount">测点数量：</label>
+        <input type="text" id="pointCount" name="pointCount"><br><br>
+
+        <label for="machineModel">机器型号：</label>
+        <select id="machineModel" name="machineModel">
+            <option>IA-2200</option>
+            <option>IA-4200</option>
+            <option>IA-4800</option>
+            <option>server</option>
+        </select>
+        <button id="encodeButton" class="button">编码</button>
+    </form>
+
+    <div id="encodedInfo" style="display: none;">
+        <h3>编码信息：</h3>
+        <div id="encodedData"></div>
+    </div>
 </div>
 
-<div id="jsonPage" style="display: none;">
-    <!-- JSON 格式化页面内容 -->
-    <!-- 这里可以放你的 JSON 格式化页面内容 -->
-    <h1>json page</h1>
-</div>
+<!--<div id="jsonPage" style="display: none;">-->
+<!--    <h1>json page</h1>-->
+<!--</div>-->
 
 <script>
     // 获取按钮元素
@@ -62,7 +94,7 @@
     var jsonPage = document.getElementById("jsonPage");
 
     // 点击 Base64 按钮时，显示 Base64 页面，隐藏 JSON 页面，并高亮 Base64 按钮
-    base64Button.addEventListener("click", function() {
+    base64Button.addEventListener("click", function () {
         base64Page.style.display = "block";
         jsonPage.style.display = "none";
         base64Button.classList.add("active");
@@ -70,11 +102,38 @@
     });
 
     // 点击 JSON 按钮时，显示 JSON 页面，隐藏 Base64 页面，并高亮 JSON 按钮
-    jsonButton.addEventListener("click", function() {
+    jsonButton.addEventListener("click", function () {
         base64Page.style.display = "none";
         jsonPage.style.display = "block";
         base64Button.classList.remove("active");
         jsonButton.classList.add("active");
+    });
+
+    document.getElementById("encodeButton").addEventListener("click", function() {
+        var serviceCount = document.getElementById("serviceCount").value;
+        var pointCount = document.getElementById("pointCount").value;
+        var machineModel = document.getElementById("machineModel").value;
+
+        // 发送编码请求到后端处理
+        fetch("/encode", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                serviceCount: serviceCount,
+                pointCount: pointCount,
+                machineModel: machineModel
+            })
+        }).then(function(response) {
+            return response.text();
+        }).then(function(encodedData) {
+            // 将编码信息显示在页面上
+            // document.getElementById("encodedData").innerHTML = encodedData;
+            // document.getElementById("encodedInfo").style.display = "block";
+        }).catch(function(error) {
+            console.error('Error:', error);
+        });
     });
 </script>
 </body>
