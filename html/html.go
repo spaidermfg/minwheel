@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/base64"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
@@ -31,12 +32,14 @@ func (b *Base64Web) web() {
 	http.HandleFunc("/", handlerFunc)
 	http.HandleFunc("/hello", indexHandler)
 	http.HandleFunc("/demo", handlerDemo)
+	fmt.Println("========================> Running")
 	http.ListenAndServe(":8080", nil)
+
 }
 
 func handlerFunc(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("is-control", "yes")
-	files, _ := template.New("").ParseFiles("text.html")
+	files, _ := template.New("").ParseFiles("html/text.html")
 	files.Execute(w, nil)
 	w.WriteHeader(http.StatusOK)
 }
@@ -114,6 +117,6 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 渲染 HTML 模板并返回给客户端
-	tmpl := template.Must(template.ParseFiles("index.html"))
+	tmpl := template.Must(template.ParseFiles("html/index.html"))
 	tmpl.Execute(w, data)
 }
