@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encrypt/Decrypt</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        /* 自定义样式 */
+        .button-group {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .button-group button {
+            width: 50%;
+        }
+
+        .center-content {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .form-container {
+            width: 50%;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="button-group">
+        <button type="button" class="btn btn-primary" onclick="showEncryptPage()">Encrypt</button>
+        <button type="button" class="btn btn-primary" onclick="showDecryptPage()">Decrypt</button>
+    </div>
+    <div id="encrypt-page" class="center-content" style="display: none;">
+        <!-- 加密页面内容 -->
+        <div class="form-container">
+            <h2>Data Encryption</h2>
+            <form id="encrypt-form">
+                <label for="data">Data:</label>
+                <input type="text" id="data" name="data" class="form-control"><br>
+                <button type="button" class="btn btn-primary" onclick="encryptData()">Encrypt</button>
+            </form>
+            <div id="encrypt-result" style="margin-top: 10px;"></div>
+        </div>
+    </div>
+    <div id="decrypt-page" class="center-content" style="display: none;">
+        <!-- 解密页面内容 -->
+        <div class="form-container">
+            <h2>Data Decryption</h2>
+            <form id="decrypt-form">
+                <label for="encoded-data">Encoded Data:</label>
+                <input type="text" id="encoded-data" name="encoded-data" class="form-control"><br>
+                <button type="button" class="btn btn-primary" onclick="decryptData()">Decrypt</button>
+            </form>
+            <div id="decrypt-result" style="margin-top: 10px;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showEncryptPage() {
+        document.getElementById("encrypt-page").style.display = "block";
+        document.getElementById("decrypt-page").style.display = "none";
+    }
+
+    function showDecryptPage() {
+        document.getElementById("encrypt-page").style.display = "none";
+        document.getElementById("decrypt-page").style.display = "block";
+    }
+
+    function encryptData() {
+        var data = document.getElementById("data").value;
+        // 使用 AJAX 发送 POST 请求
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/encrypt", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                var response = JSON.parse(xhr.responseText);
+                document.getElementById("encrypt-result").innerHTML = "Encrypted Data: " + response.result;
+            }
+        };
+        xhr.send("data=" + data);
+    }
+
+    function decryptData() {
+        var encodedData = document.getElementById("encoded-data").value;
+        // 使用 AJAX 发送 POST 请求
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/decrypt", true);
+        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && xhr.status == 200) {
+                var response = JSON.parse(xhr.responseText);
+                document.getElementById("decrypt-result").innerHTML = "Decrypted Data: " + response.result;
+            }
+        };
+        xhr.send("data=" + encodedData);
+    }
+</script>
+</body>
+</html>

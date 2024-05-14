@@ -46,6 +46,7 @@ func encode(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	log.Println("=============", string(data))
+	fmt.Fprintf(w, "hello %v", "daninel")
 }
 
 func handlerSelect(w http.ResponseWriter, r *http.Request) {
