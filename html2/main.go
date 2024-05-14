@@ -23,11 +23,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func encryptHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		// 加载加密页面模板
-		tmpl := template.Must(template.ParseFiles("html2/encrypt.html"))
-		tmpl.Execute(w, nil)
-	} else if r.Method == "POST" {
+	if r.Method == "POST" {
 		// 解析表单数据
 		r.ParseForm()
 		data := r.Form.Get("data")
@@ -44,11 +40,7 @@ func encryptHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func decryptHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		// 加载解密页面模板
-		tmpl := template.Must(template.ParseFiles("html2/encrypt.html"))
-		tmpl.Execute(w, nil)
-	} else if r.Method == "POST" {
+	if r.Method == "POST" {
 		// 解析表单数据
 		r.ParseForm()
 		encodedData := r.Form.Get("data")
