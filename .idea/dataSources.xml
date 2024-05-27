@@ -2,7 +2,7 @@
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
     <data-source source="LOCAL" name="data" uuid="b580f59e-0a2f-4006-96b7-791437c8011e">
-      <driver-ref>14cb7b3a-5fd3-46fe-80eb-f4602bf49400</driver-ref>
+      <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/beegotest/data.db</jdbc-url>
