@@ -8,7 +8,7 @@ import (
 
 // 统计字符数量
 func countLetters(r io.Reader) (map[string]int, error) {
-	buf := make([]byte, 2048)
+	buf := make([]byte, 100)
 	out := make(map[string]int)
 
 	for {
