@@ -1,8 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"io"
 	"log"
+	"os"
 	"strings"
 )
 
@@ -29,9 +31,38 @@ func countLetters(r io.Reader) (map[string]int, error) {
 	}
 }
 
+type person struct {
+	Name string
+	Age  int8
+}
+
+func jsonEn(p person) {
+	temp, err := os.CreateTemp(".", "*.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer temp.Close()
+
+	err = json.NewEncoder(temp).Encode(p)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func jsonDe() {
+
+}
+
 func main() {
 	str := "Hello, Is there a coffee on the table."
 	reader := strings.NewReader(str)
 	count, err := countLetters(reader)
 	log.Println(count, err)
+
+	// json.Encode
+	p := person{
+		Name: "mark",
+		Age:  23,
+	}
+	jsonEn(p)
 }
