@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"os"
@@ -36,7 +37,7 @@ type person struct {
 	Age  int8
 }
 
-func jsonEn(p person) {
+func jsonEn(p person) string {
 	temp, err := os.CreateTemp(".", "*.json")
 	if err != nil {
 		log.Fatal(err)
@@ -47,10 +48,25 @@ func jsonEn(p person) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	return temp.Name()
 }
 
-func jsonDe() {
+func jsonDe(file string) {
+	tmp, err := os.Open(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer func() {
+		tmp.Close()
+		os.Remove(file)
+	}()
 
+	var p person
+	err = json.NewDecoder(tmp).Decode(&p)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("name: %v, age: %v", p.Name, p.Age)
 }
 
 func main() {
@@ -64,5 +80,6 @@ func main() {
 		Name: "mark",
 		Age:  23,
 	}
-	jsonEn(p)
+	file := jsonEn(p)
+	jsonDe(file)
 }
