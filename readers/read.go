@@ -70,7 +70,7 @@ func jsonDe(file string) {
 }
 
 func main() {
-	str := "Hello, Is there a coffee on the table."
+	str := "Hello, Is there a cup of coffee on the table."
 	reader := strings.NewReader(str)
 	count, err := countLetters(reader)
 	log.Println(count, err)
