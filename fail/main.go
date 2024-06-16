@@ -99,7 +99,7 @@ func testMyError() {
 	var e *MyError
 	if errors.As(err2, &e) {
 		fmt.Println("MyError is on the chain of err2")
-		fmt.Println(err == e, err1 == e, err2 == e)
+		fmt.Println(errors.Is(e, err), errors.Is(e, err1), errors.Is(e, err2))
 		return
 	}
 
