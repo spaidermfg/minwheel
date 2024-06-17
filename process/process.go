@@ -48,3 +48,12 @@ func stop(cmd *exec.Cmd, wg *sync.WaitGroup, c chan struct{}) {
 		close(c)
 	}
 }
+
+func newCmdStop() {
+	time.Sleep(6 * time.Second)
+	name := "/Users/marksucik/Downloads/clipboard"
+	cmd := exec.CommandContext(context.Background(), name)
+
+	fmt.Println(cmd.Process.Pid)
+	cmd.Process.Kill()
+}
