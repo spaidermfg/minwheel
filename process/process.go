@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	pro "github.com/shirou/gopsutil/v4/process"
 	"log"
@@ -51,34 +52,39 @@ func stop(cmd *exec.Cmd, wg *sync.WaitGroup, c chan struct{}) {
 	}
 }
 
-func newCmdStop() {
-	time.Sleep(6 * time.Second)
-	name := "/Users/marksucik/Downloads/clipboard"
-	cmd := exec.CommandContext(context.Background(), name)
-
-	fmt.Println(cmd.Process.Pid)
-	cmd.Process.Kill()
-}
-
 func process() {
-	p, err := pro.NewProcess(33345)
+	app := "clipboard"
+	status, err := GetRunningStatus(app)
 	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println(p.Name())
-
-	processes, err := pro.Processes()
-	if err != nil {
-		log.Fatal(err)
+		log.Fatal("err1", err)
 	}
 
-	for _, v := range processes {
-		name, err1 := v.Name()
-		if err1 == nil && name == "clipboard" {
-			log.Println(v.IsRunning())
-			log.Println(name, v.Pid)
-		}
+	log.Println("status:", status)
+
+	pid, err := GetProcessPid(app)
+	if err != nil {
+		log.Fatal("err2", err)
 	}
+
+	log.Println("pid:", pid)
+
+	if err = StopProcess(context.Background(), app); err != nil {
+		log.Fatal("err3: ", err)
+	}
+
+	status, err = GetRunningStatus(app)
+	if err != nil {
+		log.Fatal("err1", err)
+	}
+
+	log.Println("status:", status)
+
+	pid, err = GetProcessPid(app)
+	if err != nil {
+		log.Fatal("err2", err)
+	}
+
+	log.Println("pid:", pid)
 }
 
 func GetRunningStatus(name string) (bool, error) {
@@ -95,4 +101,58 @@ func GetRunningStatus(name string) (bool, error) {
 	}
 
 	return false, nil
+}
+
+func StopProcess(ctx context.Context, name string) error {
+	p, err := pro.Processes()
+	if err != nil {
+		return err
+	}
+
+	for _, v := range p {
+		n, err1 := v.Name()
+		if err1 == nil && n == name {
+			log.Println(n, v.Pid)
+			return v.KillWithContext(ctx)
+		}
+	}
+
+	return errors.New("process not found")
+}
+
+func RestartProcess(ctx context.Context, name string) error {
+	p, err := pro.Processes()
+	if err != nil {
+		return err
+	}
+
+	for _, v := range p {
+		n, err1 := v.Name()
+		if err1 == nil && n == name {
+			log.Println(n, v.Pid)
+			if err1 = v.KillWithContext(ctx); err1 != nil {
+				return fmt.Errorf("stop process failed: %v", err1)
+			}
+
+			// start process
+		}
+	}
+
+	return errors.New("process not found")
+}
+
+func GetProcessPid(name string) (int32, error) {
+	p, err := pro.Processes()
+	if err != nil {
+		return 0, err
+	}
+
+	for _, v := range p {
+		n, err1 := v.Name()
+		if err1 == nil && n == name {
+			return v.Pid, nil
+		}
+	}
+
+	return 0, nil
 }
