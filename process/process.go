@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/shirou/gopsutil/v4/disk"
 	pro "github.com/shirou/gopsutil/v4/process"
 	"log"
 	"os/exec"
@@ -33,7 +34,8 @@ func main() {
 	//}
 	//
 	//wg.Wait()
-	process()
+	// process()
+	diskInfo()
 }
 
 func stop(cmd *exec.Cmd, wg *sync.WaitGroup, c chan struct{}) {
@@ -155,4 +157,18 @@ func GetProcessPid(name string) (int32, error) {
 	}
 
 	return 0, nil
+}
+
+func diskInfo() {
+	d, err := disk.Usage("/")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf(""+
+		"total:%v\n"+
+		"free:%v\n"+
+		"percent:%v\n", d.Total/(1024*1024*1024), d.Free/(1024*1024*1024), d.UsedPercent)
+
+	fmt.Println(d.String())
 }
