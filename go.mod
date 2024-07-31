@@ -1,6 +1,6 @@
 module minwheel
 
-go 1.21
+go 1.22
 
 require (
 	github.com/bytecodealliance/wasmtime-go v1.0.0
@@ -25,6 +25,7 @@ require (
 )
 
 require (
+	github.com/StackExchange/wmi v1.2.1 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
 	github.com/frankban/quicktest v1.14.6 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
@@ -46,7 +47,7 @@ require (
 	github.com/rogpeppe/fastuuid v1.2.0 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/shabbyrobe/xmlwriter v0.0.0-20200208144257-9fca06d00ffa // indirect
-	github.com/shirou/gopsutil/v4 v4.24.5 // indirect
+	github.com/shirou/gopsutil/v4 v4.24.6 // indirect
 	github.com/shoenig/go-m1cpu v0.1.6 // indirect
 	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/tealeg/xlsx/v3 v3.3.6 // indirect

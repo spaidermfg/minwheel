@@ -67,7 +67,7 @@ func TestTs(t *testing.T) {
 		select {
 		case <-tick.C:
 			now := time.Now()
-			ch := make(chan any, 3)
+			ch := make(chan any, 4)
 
 			wg := new(sync.WaitGroup)
 			wg.Add(3)
