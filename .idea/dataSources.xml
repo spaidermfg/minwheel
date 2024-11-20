@@ -2,7 +2,7 @@
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
     <data-source source="LOCAL" name="data" uuid="b580f59e-0a2f-4006-96b7-791437c8011e">
-      <driver-ref>sqlite.xerial</driver-ref>
+      <driver-ref>8d958b3c-f4e9-4d64-b0f2-2f341062c288</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/beegotest/data.db</jdbc-url>
@@ -15,6 +15,13 @@
           <url>file://$APPLICATION_CONFIG_DIR$/jdbc-drivers/Xerial SQLiteJDBC/3.34.0/sqlite-jdbc-3.34.0.jar</url>
         </library>
       </libraries>
+    </data-source>
+    <data-source source="LOCAL" name="data driver - process.db" uuid="46e08b0c-e133-40cd-851f-c515e6c89b44">
+      <driver-ref>8d958b3c-f4e9-4d64-b0f2-2f341062c288</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/process.db</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>
 </project>

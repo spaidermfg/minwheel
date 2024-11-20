@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备 pprof 页面切换</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .tabs {
+            display: flex;
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-bottom: 2px solid #ccc;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-right: 5px;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            background-color: white;
+        }
+        .tab.active {
+            background-color: #ddd;
+            font-weight: bold;
+        }
+        iframe {
+            width: 100%;
+            height: calc(100vh - 60px);
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<div class="tabs" id="tabsContainer"></div>
+<iframe id="pprofFrame"></iframe>
+
+<script>
+    async function loadDevices() {
+        const response = await fetch('/devices');
+        const devices = await response.json(); // 解析为数组
+        const tabsContainer = document.getElementById('tabsContainer');
+
+        // 清空 Tabs 容器
+        tabsContainer.innerHTML = '';
+
+        let isFirst = true;
+        devices.forEach(device => {
+            console.log("Adding tab for device:", device.name); // 调试点：打印设备名
+
+            // 创建 Tab 元素
+            const tab = document.createElement('div');
+            tab.classList.add('tab');
+            tab.textContent = device.name; // 使用返回 JSON 中的 name 字段
+            tab.dataset.device = device.name;
+
+            // 默认激活第一个 Tab
+            if (isFirst) {
+                tab.classList.add('active');
+                loadPprof(device.name); // 使用 name 字段调用 proxy 接口
+                isFirst = false;
+            }
+
+            // 点击事件
+            tab.onclick = () => {
+                document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+                tab.classList.add('active');
+                loadPprof(device.name); // 使用 name 字段调用 proxy 接口
+            };
+
+            tabsContainer.appendChild(tab);
+        });
+    }
+
+    // 加载设备的 pprof 页面
+    function loadPprof(deviceName) {
+        const iframe = document.getElementById('pprofFrame');
+        iframe.src = `/proxy?device=${deviceName}`;
+    }
+
+    // 初始化加载
+    loadDevices();
+
+</script>
+</body>
+</html>

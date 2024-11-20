@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pprof 监控切换</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .tabs {
+            display: flex;
+            background-color: #f4f4f4;
+            border-bottom: 2px solid #ccc;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            margin-right: 5px;
+            background-color: #fff;
+            transition: background-color 0.3s;
+        }
+        .tab.active {
+            background-color: #ddd;
+            font-weight: bold;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 90vh;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+<div class="tabs">
+    <div class="tab active" data-url="http://192.168.40.60:8899/debug/pprof/">设备 40.60</div>
+    <div class="tab" data-url="http://192.168.40.61:8899/debug/pprof/">设备 40.61</div>
+    <div class="tab" data-url="http://192.168.40.62:8899/debug/pprof/">设备 40.62</div>
+    <div class="tab" data-url="http://192.168.40.63:8899/debug/pprof/">设备 40.63</div>
+</div>
+<div class="iframe-container">
+    <iframe id="iframe" src="http://192.168.40.60:8899/debug/pprof/"></iframe>
+</div>
+
+<script>
+    const tabs = document.querySelectorAll('.tab');
+    const iframe = document.getElementById('iframe');
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // 移除其他 tab 的 active 类
+            tabs.forEach(t => t.classList.remove('active'));
+            // 给当前点击的 tab 添加 active 类
+            tab.classList.add('active');
+            // 更换 iframe 的 src
+            iframe.src = tab.getAttribute('data-url');
+        });
+    });
+</script>
+</body>
+</html>
