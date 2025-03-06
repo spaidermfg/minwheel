@@ -97,21 +97,21 @@ func (r *Rules) getNetInfo(data []*Network) {
 			}
 		} else {
 			switch v.Businfo {
-			case "pci@0000:10:00.0":
+			case "pci@0000:10:00.0", "pci@0000:04:00.0":
 				add("lan3", v.Serial)
-			case "pci@0000:10:00.1":
+			case "pci@0000:10:00.1", "pci@0000:04:00.1":
 				add("lan4", v.Serial)
-			case "pci@0000:10:00.2":
+			case "pci@0000:10:00.2", "pci@0000:04:00.2":
 				add("lan5", v.Serial)
-			case "pci@0000:10:00.3":
+			case "pci@0000:10:00.3", "pci@0000:04:00.3":
 				add("lan6", v.Serial)
-			case "pci@0000:11:00.0":
+			case "pci@0000:11:00.0", "pci@0000:02:00.0":
 				add("lan7", v.Serial)
-			case "pci@0000:11:00.1":
+			case "pci@0000:11:00.1", "pci@0000:02:00.1":
 				add("lan8", v.Serial)
-			case "pci@0000:11:00.2":
+			case "pci@0000:11:00.2", "pci@0000:02:00.2":
 				add("lan9", v.Serial)
-			case "pci@0000:11:00.3":
+			case "pci@0000:11:00.3", "pci@0000:02:00.3":
 				add("lan10", v.Serial)
 			}
 		}

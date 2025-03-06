@@ -158,3 +158,21 @@ func getPointStatus() (bool, error) {
 	time.Sleep(time.Second * 1)
 	return true, nil
 }
+
+func TestCh1(t *testing.T) {
+	ch := make(chan int, 2)
+
+	go sendCh(ch)
+	select {
+	case a := <-ch:
+		fmt.Println("----", a)
+	}
+}
+
+func sendCh(ch chan int) {
+	time.Sleep(time.Second * 2)
+	ch <- 1
+
+	time.Sleep(time.Second * 2)
+	ch <- 2
+}
