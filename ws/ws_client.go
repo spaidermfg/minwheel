@@ -19,7 +19,7 @@ var (
 
 func init() {
 	// 解析命令行参数
-	flag.StringVar(&serverURL, "url", "ws://127.0.0.1:8085/ws/magus-edass/monitor", "WebSocket 服务器地址")
+	flag.StringVar(&serverURL, "url", "ws://127.0.0.1:8081/ws", "WebSocket 服务器地址")
 	flag.Parse()
 }
 
